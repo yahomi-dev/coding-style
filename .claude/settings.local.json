@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx:*)",
+      "Bash(npm cache:*)",
+      "Bash(node dist/index.js)"
+    ]
+  }
+}
