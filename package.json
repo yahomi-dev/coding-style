@@ -1,0 +1,19 @@
+{
+	"name": "coding-style",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"check": "biome check .",
+		"format": "biome check --write .",
+		"lint": "biome lint ."
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.8",
+		"typescript": "^5.9.3"
+	}
+}
