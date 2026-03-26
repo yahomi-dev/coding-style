@@ -6,7 +6,9 @@
       "Bash(npx tsc:*)",
       "Bash(npx:*)",
       "Bash(npm cache:*)",
-      "Bash(node dist/index.js)"
+      "Bash(node dist/index.js)",
+      "WebSearch",
+      "WebFetch(domain:anthropic.com)"
     ]
   }
 }
