@@ -17,7 +17,13 @@
 		"rules": {
 			"recommended": true,
 			"style": {
-				"noDefaultExport": "on"
+				"noDefaultExport": "on",
+				"useConsistentTypeDefinitions": {
+					"level": "error",
+					"options": {
+						"style": "type"
+					}
+				}
 			}
 		}
 	},

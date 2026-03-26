@@ -2,10 +2,17 @@
 
 ## 前提方針
 
+### interfaceを使用しない（typeに統一する）
+
+- 型定義にはすべて `type` を使用する。`interface` は使用しない
+- ユニオン型やリテラル型を活用してデータモデルを定義するため、`type` でなければ表現できない場面が多い
+- `interface` と `type` を両立させると「この型はどちらで定義すべきか」という判断コストが発生するため、`type` に統一して判断コストをなくす
+- Biomeの `useConsistentTypeDefinitions` ルール（style: "type"）で強制する
+
 ### class構文を使用しない
 
 - class, this, new, prototype, super は使用しない
-- 型（type/interface）でデータを定義し、関数で振る舞いを定義する
+- 型（type）でデータを定義し、関数で振る舞いを定義する
 - 依存性の逆転は関数を引数で受け取ることで実現する
 - フレームワークがclass前提のAPIを提供している場合は例外として許容する
 

@@ -1,14 +1,17 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(npm init:*)",
-      "Bash(npm install:*)",
-      "Bash(npx tsc:*)",
-      "Bash(npx:*)",
-      "Bash(npm cache:*)",
-      "Bash(node dist/index.js)",
-      "WebSearch",
-      "WebFetch(domain:anthropic.com)"
-    ]
-  }
+	"permissions": {
+		"allow": [
+			"Bash(npm init:*)",
+			"Bash(npm install:*)",
+			"Bash(npx tsc:*)",
+			"Bash(npx:*)",
+			"Bash(npm cache:*)",
+			"Bash(node dist/index.js)",
+			"WebSearch",
+			"WebFetch(domain:anthropic.com)",
+			"mcp__context7__resolve-library-id",
+			"mcp__context7__query-docs",
+			"WebFetch(domain:biomejs.dev)"
+		]
+	}
 }
