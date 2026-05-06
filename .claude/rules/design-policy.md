@@ -56,3 +56,62 @@ type Rule = {
 - ロジックを担う関数は純粋関数として実装する
 - 入出力（console.log、API呼び出し、ファイル操作等）はエントリポイントやアダプタ層で行う
 - mapを副作用の実行に使用しない（mapは変換用）
+
+## テスト戦略
+
+このプロジェクトのテスト戦略は、上記の設計（純粋関数・I/O 引数化・副作用分離）から自動的に導かれる。新しい方針ではなく、既存の設計の延長として捉える。
+
+### 古典学派 (Detroit school) に従う
+
+- 検証は state-based / value-based で行う（「何が呼ばれたか」ではなく「何が返ったか」）
+- 呼び出し履歴を verify するロンドン学派 (mockist) は採らない
+- そもそも class / メソッドが存在しないため、相互作用検証する対象が構造的に無い
+
+### Mock ではなく Stub / Fake を使う
+
+- 値を返すだけの **Stub**、軽量な本物実装の **Fake** を使う
+- 呼び出しを検証する **Mock** は使用しない
+- I/O は引数で受け取るルール（関数設計）の帰結として、テストでは普通の関数/オブジェクトを渡すだけでよい。Mock ライブラリは原則不要
+
+```ts
+// プロダクション: I/O を引数で受け取る
+const greet = async (
+    id: UserId,
+    deps: { fetchUser: FetchUser },
+): Promise<Result<string, FetchError>> => {
+    // ...
+};
+
+// テスト: Stub を関数として渡すだけ。Mock ライブラリ不要
+test("ユーザー名で挨拶を返す", async () => {
+    const fetchUser: FetchUser = async (id) => {
+        return { ok: true, value: { id, name: "Alice" } };
+    };
+
+    const result = await greet("u1" as UserId, { fetchUser });
+
+    expect(result).toEqual({ ok: true, value: "Hello, Alice" });
+});
+```
+
+### Test Double は外部境界のみで使う
+
+- 自分のコードのモジュール間呼び出しを double しない（実装詳細との結合が強くなりリファクタ耐性が落ちる）
+- 対象は HTTP / DB / ファイルシステム等、自分が制御しない外部依存 (unmanaged dependencies) のみ
+- HTTP は MSW、DB は testcontainers 等、ネットワーク/プロセス層で差し替える
+
+### テストの単位は「振る舞い」で切る
+
+- 「1テスト = 1関数」に固執しない
+- 隣接する純粋関数を組み合わせて、ドメインの振る舞い単位でテストする（古典学派の sociable test）
+- 関数の export 単位とテストの粒度は一致しなくてよい
+
+### Discriminated Union を持つドメインは property-based testing を検討する
+
+- ADT の網羅性を fast-check 等のジェネレータで担保する
+- `assertNever` による型レベルの網羅性チェックとペアで使うと、型と値の両面で抜けが防げる
+
+### 型レベルテストで型契約を守る
+
+- Branded Type / Discriminated Union / `Result<T, E>` 等の型契約自体を `expect-type` で検証する
+- 「Parse, Don't Validate」の境界では、parser テストが型システムへの入り口の防衛線になる

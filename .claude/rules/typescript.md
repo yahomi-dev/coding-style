@@ -1,5 +1,21 @@
 # TypeScript コーディングルール
 
+## 設計思想
+
+このルールセットは **関数型 × データ指向TypeScript (FP × DOP TypeScript)** スタイルに基づく。OOP（class / 継承 / メソッド）は使わず、型でデータを定義し関数で振る舞いを定義する。
+
+### 核となる5つの原則
+
+1. **データと振る舞いの分離**: `type` でデータを定義し、関数で振る舞いを定義する（class / this / new / 継承は使わない）
+2. **型でドメインを表現する**: discriminated union と branded type で「不正な状態を表現不可能」にする（Make Impossible States Impossible）
+3. **イミュータブル前提**: `const` と非破壊API（スプレッド / `toSorted` / `toReversed` 等）で状態変更を排除する
+4. **失敗を値として扱う**: `throw` ではなく `Result<T, E>` で失敗を戻り値の型に現す
+5. **副作用を境界に閉じ込める**: ロジックは純粋関数、I/O や非決定的な値（時刻・乱数・環境変数）は引数で受け取る
+
+### 判断基準
+
+ルールに明記されていない場面で迷ったら、上記5つの原則に立ち返る。「この書き方は関数型 × データ指向の思想に沿うか？」を判断基準にする。原則と個別ルールが矛盾するように見えた場合は、原則を優先しつつルールの更新を検討する。
+
 ## 前提方針
 
 ### interfaceを使用しない（typeに統一する）
@@ -50,6 +66,102 @@ type User = {
 - JSONシリアライズでは `null` は値として残るが `undefined` はフィールドごと消える。APIレスポンスで「フィールドは存在するが値がない」ことを明示する必要がある場合は、APIのスキーマ設計で別途対応する（例: フィールド自体をオプショナルにする）
 - `??`（nullish coalescing）は `null` と `undefined` の両方を拾う。`null` を使わない方針であれば `??` は `undefined` のフォールバックとしてのみ機能する
 
+## ドメインモデリング
+
+### Discriminated Union（タグ付きユニオン）でドメイン状態を表現する
+
+- 排他的な状態を持つドメインモデルは、tag フィールドを持つ discriminated union で表現する
+- データ指向プログラミングの「データのスキーマと表現を分離する」原則に従う
+- 単一のオブジェクトに boolean フラグを並べて状態を表現することを避ける
+
+```ts
+// NG: boolean フラグの並列で不正な状態を作れてしまう
+type FetchState = {
+    isLoading: boolean;
+    isError: boolean;
+    data?: User;
+    error?: Error;
+};
+
+// OK: tag フィールドで状態を排他にする
+type FetchState =
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "success"; data: User }
+    | { status: "error"; error: Error };
+```
+
+### Make Impossible States Impossible（不正な状態を型で表現不可能にする）
+
+- boolean フラグを2つ以上並べて状態を表現する場合は、discriminated union への置き換えを検討する
+- 「あり得ない組み合わせ」を型レベルで除去し、ランタイムの防御的コードを減らす
+
+### Branded Type でプリミティブの誤用を防ぐ
+
+- ID やメールアドレスのような「意味を持つ string / number」は branded type で別名化する
+- 構造的に同じ型でも、誤って混ぜることを型レベルで防ぐ
+- スマートコンストラクタ（パース関数）とペアで使う
+
+```ts
+type UserId = string & { readonly __brand: "UserId" };
+type Email = string & { readonly __brand: "Email" };
+
+const createEmail = (input: string): Result<Email, ParseError> => {
+    if (!input.includes("@")) {
+        return { ok: false, error: { kind: "invalid_email", input } };
+    }
+
+    return { ok: true, value: input as Email };
+};
+
+// UserId を渡すとコンパイルエラーになる
+const sendMail = (to: Email): void => {
+    // ...
+};
+```
+
+### Parse, Don't Validate（境界で型を確定させる）
+
+- 外部入力（APIレスポンス・フォーム・JSON・ファイル等）は `unknown` で受け取る
+- Zod / Valibot 等のスキーマライブラリでパースし、型を獲得してから内部に流す
+- `boolean` を返す validate ではなく、型を返す parse を使う
+
+```ts
+// NG: validate して boolean を返す
+const isUser = (input: unknown): boolean => {
+    // ...
+};
+
+// OK: parse して型を獲得する
+const parseUser = (input: unknown): Result<User, ParseError> => {
+    // ...
+};
+```
+
+### Total Function（全域関数）を志向する
+
+- 入力ドメインの一部で例外を投げたり `undefined` を返したりする部分関数を避ける
+- 失敗の可能性は戻り値の型で表現するか、入力型を絞り込んで失敗を排除する
+
+```ts
+// NG: 空配列で undefined になるのに型に現れない
+const head = <T>(arr: T[]): T => {
+    return arr[0];
+};
+
+// OK: 型で表現する
+const head = <T>(arr: T[]): T | undefined => {
+    return arr[0];
+};
+
+// または入力を絞る
+type NonEmptyArray<T> = readonly [T, ...T[]];
+
+const headOfNonEmpty = <T>(arr: NonEmptyArray<T>): T => {
+    return arr[0];
+};
+```
+
 ## 変数宣言
 
 - `const` のみ使用する。`let` / `var` は禁止
@@ -91,6 +203,24 @@ export const toPercent: Formatter = (value) => {
 
 export const toCurrency: Formatter = (value) => {
     return `¥${value}`;
+};
+```
+
+### I/O や非決定的な値は引数で受け取る
+
+- ロジック関数は同じ入力に対して同じ出力を返す純粋関数として書く
+- I/O（fetch / DB / console / ファイル）や非決定的な値（`Date.now()`, `Math.random()`, 環境変数）は関数内部で取得せず、引数として受け取る
+- 「依存性の逆転は関数を引数で受け取ることで実現する」ルールの拡張で、I/O も同じ枠組みで扱う
+
+```ts
+// NG: 関数内部で時刻を取得するためテストしにくい
+const isExpired = (token: Token): boolean => {
+    return token.expiresAt < Date.now();
+};
+
+// OK: 時刻を引数で受け取る
+const isExpired = (token: Token, now: number): boolean => {
+    return token.expiresAt < now;
 };
 ```
 
@@ -152,6 +282,81 @@ return result;
 
 - ループの代わりに再帰を使うことは禁止
 
+### Discriminated Union の網羅性は `assertNever` で担保する
+
+- if文の連鎖で discriminated union を分岐する場合、すべてのタグを処理したことを型レベルで保証する
+- ユニオンに新しいタグが追加されたとき、コンパイルエラーで処理漏れに気付ける
+
+```ts
+const assertNever = (value: never): never => {
+    throw new Error(`Unexpected value: ${JSON.stringify(value)}`);
+};
+
+type FetchState =
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "success"; data: User }
+    | { status: "error"; error: Error };
+
+const render = (state: FetchState): string => {
+    if (state.status === "idle") {
+        return "待機中";
+    }
+
+    if (state.status === "loading") {
+        return "読み込み中";
+    }
+
+    if (state.status === "success") {
+        return state.data.name;
+    }
+
+    if (state.status === "error") {
+        return state.error.message;
+    }
+
+    return assertNever(state);
+};
+```
+
+## エラー処理
+
+### `throw` ではなく `Result<T, E>` を返す
+
+- 関数の失敗は戻り値の型で表現する
+- `throw` はシグネチャに現れず、呼び出し側が失敗の可能性を見落としやすい
+- 失敗の可能性がある関数は `Result` 型を返す
+
+```ts
+type Result<T, E> =
+    | { ok: true; value: T }
+    | { ok: false; error: E };
+
+// NG: 関数シグネチャから失敗が見えない
+const parseUser = (input: string): User => {
+    if (!isValid(input)) {
+        throw new Error("invalid");
+    }
+
+    return toUser(input);
+};
+
+// OK: 失敗が型に現れる
+const parseUser = (input: string): Result<User, ParseError> => {
+    if (!isValid(input)) {
+        return { ok: false, error: { kind: "invalid", input } };
+    }
+
+    return { ok: true, value: toUser(input) };
+};
+```
+
+#### `throw` を許容する例外
+
+- I/O境界でフレームワークが例外を要求する場合
+- プログラムのバグを示す即死パス（`assertNever` 等の到達不能パス）
+- 外部ライブラリが `throw` する場合は境界で `Result` に変換する
+
 ## ループ処理
 
 ### 逐次処理は禁止し、高階関数を使う
@@ -185,6 +390,37 @@ items.filter((item) => {
 
 ### 高階関数に渡すコールバック内でif文は禁止
 
+## イミュータビリティ
+
+### 破壊的なメソッド・APIを使用しない
+
+`const` だけではオブジェクトや配列の中身の変更を防げない。以下の破壊的APIは使用しない:
+
+- `Array#push` / `pop` / `shift` / `unshift`
+- `Array#splice` / `sort` / `reverse` / `fill` / `copyWithin`
+- `Object.assign(target, ...)` の第一引数を変更する用法
+- プロパティへの直接代入による変更（`obj.x = y`）
+
+代わりに非破壊APIを使う:
+
+- スプレッド構文（`[...arr, x]`, `{ ...obj, key: value }`）
+- ES2023 非破壊メソッド（`toSorted`, `toReversed`, `toSpliced`, `with`）
+- `Object.assign({}, ...)` のように新規オブジェクトを生成する形
+
+```ts
+// NG
+arr.push(x);
+arr.sort();
+Object.assign(obj, { key: "value" });
+obj.x = y;
+
+// OK
+const next = [...arr, x];
+const sorted = arr.toSorted();
+const merged = { ...obj, key: "value" };
+const updated = { ...obj, x: y };
+```
+
 ## export / import
 
 ### named exportを使用する（default export禁止）
@@ -208,6 +444,34 @@ export { greet } from "./greet.js";
 ```
 
 ## 型定義
+
+### `any` を使用せず、境界では `unknown` を使う
+
+- `any` は型チェックを無効化するため使用しない
+- 外部入力など型が確定していない値は `unknown` で受け取り、型ガード（`is` predicate）またはスキーマパースで絞り込む
+
+```ts
+// NG
+const handle = (input: any) => {
+    return input.name;
+};
+
+// OK
+const isUser = (input: unknown): input is User => {
+    return typeof input === "object"
+        && input !== null
+        && "name" in input
+        && typeof (input as Record<string, unknown>).name === "string";
+};
+
+const handle = (input: unknown): string | undefined => {
+    if (isUser(input)) {
+        return input.name;
+    }
+
+    return undefined;
+};
+```
 
 ### 関数型にはtype aliasを使う
 
