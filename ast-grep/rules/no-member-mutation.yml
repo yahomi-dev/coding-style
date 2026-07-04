@@ -1,0 +1,91 @@
+id: no-member-mutation
+language: TypeScript
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.ts"
+message: プロパティ / 要素への代入・削除は使用しない（スプレッドで新しい値を作る）
+note: |-
+  `obj.x = y` -> `{ ...obj, x: y }` / `arr[i] = v` -> `arr.with(i, v)` を使う。
+  外部オブジェクトの変更が必須な I/O アダプタ層（**/adapters/**, *.adapter.ts）は対象外。
+  React の mutable ref パターン（/Ref$/ 命名変数への `.current` 代入）は除外される。
+  局所ミューテーションの例外条件（typescript.md）を満たす場合は
+  前行に `// ast-grep-ignore: no-member-mutation` と理由を書いて除外する。
+rule:
+  any:
+    - all:
+        - kind: assignment_expression
+        - has:
+            field: left
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: left
+              regex: Ref\.current$
+    - all:
+        - kind: augmented_assignment_expression
+        - has:
+            field: left
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: left
+              regex: Ref\.current$
+    - all:
+        - kind: update_expression
+        - has:
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: argument
+              regex: Ref\.current$
+    - pattern: delete $EXPR
+---
+id: no-member-mutation-tsx
+language: Tsx
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.tsx"
+message: プロパティ / 要素への代入・削除は使用しない（スプレッドで新しい値を作る）
+rule:
+  any:
+    - all:
+        - kind: assignment_expression
+        - has:
+            field: left
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: left
+              regex: Ref\.current$
+    - all:
+        - kind: augmented_assignment_expression
+        - has:
+            field: left
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: left
+              regex: Ref\.current$
+    - all:
+        - kind: update_expression
+        - has:
+            any:
+              - kind: member_expression
+              - kind: subscript_expression
+        - not:
+            has:
+              field: argument
+              regex: Ref\.current$
+    - pattern: delete $EXPR

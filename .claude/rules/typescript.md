@@ -16,607 +16,226 @@
 
 ルールに明記されていない場面で迷ったら、上記5つの原則に立ち返る。「この書き方は関数型 × データ指向の思想に沿うか？」を判断基準にする。原則と個別ルールが矛盾するように見えた場合は、原則を優先しつつルールの更新を検討する。
 
-## 前提方針
+### 強制レイヤ
 
-### interfaceを使用しない（typeに統一する）
+機械検査可能なルールは Biome / ast-grep / tsconfig で強制する（対応表: docs/coding-standards.md）。本書が扱うのは原則と、静的検査できない判断ルール。lint エラーの message / note に根拠と代替が書いてあるので、違反時はそれに従う。正当な例外は違反行の前行に `// ast-grep-ignore: <rule-id>` と理由を書いて抑制する。
 
-- 型定義にはすべて `type` を使用する。`interface` は使用しない
-- ユニオン型やリテラル型を活用してデータモデルを定義するため、`type` でなければ表現できない場面が多い
-- `interface` と `type` を両立させると「この型はどちらで定義すべきか」という判断コストが発生するため、`type` に統一して判断コストをなくす
-- Biomeの `useConsistentTypeDefinitions` ルール（style: "type"）で強制する
+## 言語機能の選択（機械強制済み）
 
-### class構文を使用しない
+詳細な根拠は lint メッセージと docs/coding-standards.md を参照。
 
-- class, this, new, prototype, super は使用しない
-- 型（type）でデータを定義し、関数で振る舞いを定義する
-- 依存性の逆転は関数を引数で受け取ることで実現する
-- フレームワークがclass前提のAPIを提供している場合は例外として許容する
+- 型定義は `type` に統一、`interface` 不使用（Biome）
+- `class` 不使用。依存性の注入は関数を引数で受け取る（ast-grep）。フレームワークが class を強制する場合のみ suppression で除外
+- `enum` 不使用。ユニオン型か `as const satisfies` で代替（tsconfig erasableSyntaxOnly + ast-grep）
+- `let` / `var` 不使用、`const` のみ（ast-grep / Biome）
+- `function` 宣言・式、ジェネレータ、メソッド定義は不使用。すべてアロー関数（ast-grep）。遅延列は Iterator helpers で代替
+- `switch` / `else if` 不使用（ast-grep）
+- 破壊的メソッド（push / sort / splice / プロパティ代入 / delete 等）不使用（ast-grep）
 
-### enum（列挙型）を使用しない
+### null は使用しない（undefined に統一）
 
-- enumはランタイムにオブジェクトを生成し、Tree Shakingとの相性が悪い
-- ユニオン型やas constで代替する
-
-### nullは使用しない（undefinedに統一する）
-
-- 値の不在を表すには `undefined` を使用する。`null` は使用しない
-- TypeScript/JSの言語仕様（省略可能な引数、オプショナルプロパティ、`?.` 演算子等）が自然に `undefined` を返すため、統一することで比較時の判断コストがなくなる
-- 型で不在を表すにはオプショナル（`?`）を使う
-
-```ts
-// NG
-type User = {
-    name: string;
-    nickname: string | null;
-};
-
-// OK
-type User = {
-    name: string;
-    nickname?: string;
-};
-```
-
-#### 例外
-
-- 外部APIやライブラリが `null` を返す場合は受け取らざるを得ない。その境界で `undefined` に変換する
-
-#### 注意事項
-
-- JSONシリアライズでは `null` は値として残るが `undefined` はフィールドごと消える。APIレスポンスで「フィールドは存在するが値がない」ことを明示する必要がある場合は、APIのスキーマ設計で別途対応する（例: フィールド自体をオプショナルにする）
-- `??`（nullish coalescing）は `null` と `undefined` の両方を拾う。`null` を使わない方針であれば `??` は `undefined` のフォールバックとしてのみ機能する
+- 値の不在は `undefined`。型はオプショナル（`?`）で表す（ast-grep no-null）
+- 外部 API / DOM / ライブラリから来る `null` は受け取った境界で `undefined` に変換する。`=== null` / `== null` の比較は境界検査として許可される
+- 注意: JSON では `null` は値として残り `undefined` はフィールドごと消える。「フィールドはあるが値がない」を表す必要があればスキーマ設計で対応する
+- `??` は `undefined` のフォールバックとしてのみ使う
 
 ## ドメインモデリング
 
-### Discriminated Union（タグ付きユニオン）でドメイン状態を表現する
+### Discriminated Union でドメイン状態を表現する
 
-- 排他的な状態を持つドメインモデルは、tag フィールドを持つ discriminated union で表現する
-- データ指向プログラミングの「データのスキーマと表現を分離する」原則に従う
-- 単一のオブジェクトに boolean フラグを並べて状態を表現することを避ける
+排他的な状態は tag フィールドを持つ discriminated union で表現し、boolean フラグの並列で表現しない（Make Impossible States Impossible）。
 
 ```ts
-// NG: boolean フラグの並列で不正な状態を作れてしまう
+// NG: フラグの組み合わせで不正な状態を作れてしまう
 type FetchState = {
     isLoading: boolean;
     isError: boolean;
     data?: User;
-    error?: Error;
 };
 
-// OK: tag フィールドで状態を排他にする
+// OK: tag で状態を排他にする
 type FetchState =
     | { status: "idle" }
     | { status: "loading" }
     | { status: "success"; data: User }
-    | { status: "error"; error: Error };
+    | { status: "error"; error: FetchError };
 ```
 
-### Make Impossible States Impossible（不正な状態を型で表現不可能にする）
+### Branded Type とスマートコンストラクタ
 
-- boolean フラグを2つ以上並べて状態を表現する場合は、discriminated union への置き換えを検討する
-- 「あり得ない組み合わせ」を型レベルで除去し、ランタイムの防御的コードを減らす
+意味を持つ string / number は branded type で別名化し、パース関数（スマートコンストラクタ）とペアで使う。brand 付与の `as` はスマートコンストラクタ内でのみ許可され、スマートコンストラクタは `*.parse.ts`（または `parse/`）に置く（型の入り口 = パーサ）。実例: coding-style リポの `src/email.parse.ts`。
 
-### Branded Type でプリミティブの誤用を防ぐ
+### Parse, Don't Validate
 
-- ID やメールアドレスのような「意味を持つ string / number」は branded type で別名化する
-- 構造的に同じ型でも、誤って混ぜることを型レベルで防ぐ
-- スマートコンストラクタ（パース関数）とペアで使う
+外部入力（API レスポンス・フォーム・JSON 等）は `unknown` で受け、**Zod** でパースして型を獲得してから内部に流す。`safeParse` の戻り値は `fromZod`（vendored schema.ts）で `Result` に変換する。boolean を返す validate ではなく型を返す parse を書く。
 
-```ts
-type UserId = string & { readonly __brand: "UserId" };
-type Email = string & { readonly __brand: "Email" };
+### Total Function を志向する
 
-const createEmail = (input: string): Result<Email, ParseError> => {
-    if (!input.includes("@")) {
-        return { ok: false, error: { kind: "invalid_email", input } };
-    }
+入力の一部で例外を投げたり黙って undefined を返したりする部分関数を避け、失敗の可能性は戻り値の型で表すか、入力型を絞って失敗を排除する（例: `NonEmptyArray<T> = readonly [T, ...T[]]`）。`noUncheckedIndexedAccess` により添字アクセスは `T | undefined` になるので、undefined を型で処理する。
 
-    return { ok: true, value: input as Email };
-};
+## 型アサーション
 
-// UserId を渡すとコンパイルエラーになる
-const sendMail = (to: Email): void => {
-    // ...
-};
-```
+**型注釈 = 契約の宣言 / satisfies = 検査（型を変えない）/ as = 上書きの最終手段** と使い分ける。
 
-### Parse, Don't Validate（境界で型を確定させる）
-
-- 外部入力（APIレスポンス・フォーム・JSON・ファイル等）は `unknown` で受け取る
-- Zod / Valibot 等のスキーマライブラリでパースし、型を獲得してから内部に流す
-- `boolean` を返す validate ではなく、型を返す parse を使う
-
-```ts
-// NG: validate して boolean を返す
-const isUser = (input: unknown): boolean => {
-    // ...
-};
-
-// OK: parse して型を獲得する
-const parseUser = (input: unknown): Result<User, ParseError> => {
-    // ...
-};
-```
-
-### Total Function（全域関数）を志向する
-
-- 入力ドメインの一部で例外を投げたり `undefined` を返したりする部分関数を避ける
-- 失敗の可能性は戻り値の型で表現するか、入力型を絞り込んで失敗を排除する
-
-```ts
-// NG: 空配列で undefined になるのに型に現れない
-const head = <T>(arr: T[]): T => {
-    return arr[0];
-};
-
-// OK: 型で表現する
-const head = <T>(arr: T[]): T | undefined => {
-    return arr[0];
-};
-
-// または入力を絞る
-type NonEmptyArray<T> = readonly [T, ...T[]];
-
-const headOfNonEmpty = <T>(arr: NonEmptyArray<T>): T => {
-    return arr[0];
-};
-```
-
-## 変数宣言
-
-- `const` のみ使用する。`let` / `var` は禁止
+- `as` が許されるのは3つのみ: `as const`、スマートコンストラクタの brand 付与、境界パーサ内部（後者2つは `*.parse.ts` / `parse/` に置くことで ast-grep が強制）
+- 非 null アサーション `!` は禁止（Biome noNonNullAssertion）。代替: 早期 return / `??` / `isDefined` 型ガード（vendored array.ts）
+- 型の確認には `satisfies` を使い、`as` で型を上書きしない
 
 ## 関数定義
 
-### アロー関数で統一する
-
-- function宣言・function式は使用しない。すべてアロー関数で定義する
-- classを使わない方針のためthisの罠が存在せず、function宣言を選ぶ理由がない
-- アロー関数は変数側に型を付けられるため、型エイリアスとの組み合わせで型契約を表現できる
-
-### アロー関数のブロック省略を禁止する
-
-- 暗黙のreturn（ブロック省略）は使用しない。必ず `{}` と明示的な `return` を書く
-- 「この場合は省略OK、この場合はダメ」という判断コストをなくすための統一ルール
+- すべてアロー関数。基本形はブロック本体 + 明示 `return`
+- **例外**: 呼び出しの引数・オブジェクトプロパティ（React では JSX 属性も）に直接書くインラインコールバックは式本体を許可
 
 ```ts
-// NG
-const double = (n: number) => n * 2;
+// OK: インラインコールバックは式本体で書ける
+const names = users.filter((u) => u.isActive).map((u) => u.name);
 
-// OK
-const double = (n: number) => {
+// 宣言に束縛する関数はブロック + 明示 return
+const double = (n: number): number => {
     return n * 2;
 };
 ```
 
-### 共通の型契約がある関数は変数側に型を付けることを検討する
-
-- 同じシグネチャを複数の関数が共有する場合、型エイリアスを定義し変数側に型を付ける
-- すべての関数に強制するのではなく、共通の契約がある関数に限定する
-
-```ts
-type Formatter = (value: number) => string;
-
-export const toPercent: Formatter = (value) => {
-    return `${value}%`;
-};
-
-export const toCurrency: Formatter = (value) => {
-    return `¥${value}`;
-};
-```
-
-### I/O や非決定的な値は引数で受け取る
-
-- ロジック関数は同じ入力に対して同じ出力を返す純粋関数として書く
-- I/O（fetch / DB / console / ファイル）や非決定的な値（`Date.now()`, `Math.random()`, 環境変数）は関数内部で取得せず、引数として受け取る
-- 「依存性の逆転は関数を引数で受け取ることで実現する」ルールの拡張で、I/O も同じ枠組みで扱う
-
-```ts
-// NG: 関数内部で時刻を取得するためテストしにくい
-const isExpired = (token: Token): boolean => {
-    return token.expiresAt < Date.now();
-};
-
-// OK: 時刻を引数で受け取る
-const isExpired = (token: Token, now: number): boolean => {
-    return token.expiresAt < now;
-};
-```
+- exported 関数は戻り値型を明示する（declaration を出すパッケージでは tsconfig isolatedDeclarations が強制する）
+- 配列を受ける引数は `readonly T[]` で受ける。戻り値は新規生成なら素の `T[]` で可、共有データを返すなら readonly
+- 共通のシグネチャを持つ関数群は type alias を定義して変数側に付ける
+- I/O・非決定的な値（時刻・乱数・環境変数）は関数内部で取得せず引数で受け取る（詳細と例: design-policy.md）
 
 ## 制御構造
 
-### if文
+- if はブロック必須（Biome useBlockStatements）、ブロックの前後に空行を入れる。`else if` は使わず早期 return で平坦化する
+- 三項演算子は**式の位置での boolean -> 値の選択**に限り使用可。ネスト禁止（Biome noNestedTernary）。文としての分岐は if で書く（ast-grep no-ternary-statement）
+- `&&` / `||` を分岐として使わない（ast-grep no-short-circuit-statement）。値のフォールバック `a ?? b` / `a || b` は式の位置でのみ使う
 
-- else if を含むネストした if は禁止
-- if文のブロック `{}` は省略しない
-- if文ブロックの前後には空行を入れる
+### Discriminated Union の分岐は ts-pattern
 
-```ts
-// NG
-if (x) return y;
-const a = 1;
-if (y) {
-    return z;
-}
-const b = 2;
-
-// OK
-if (x) {
-    return y;
-}
-
-const a = 1;
-
-if (y) {
-    return z;
-}
-
-const b = 2;
-```
-
-### switch文は禁止
-
-### 三項演算子は使用しない
-
-- 値の選択を含め、条件による分岐はすべてif文ブロックで行う
-- returnする値の出し分けにも三項演算子を使わない
+DU の網羅的な分岐は ts-pattern の `match().exhaustive()` を正規手段とする。網羅性はコンパイル時に保証される（未マッチ時のランタイム throw は assertNever と同等で、消えるのはボイラープレート）。実例: coding-style リポの `src/fetchState.ts`。
 
 ```ts
-// NG
-return result === "" ? String(n) : result;
+import { match } from "ts-pattern";
 
-// OK
-if (result === "") {
-    return String(n);
-}
-
-return result;
+const render = (state: FetchState): string => {
+    return match(state)
+        .with({ status: "idle" }, () => "待機中")
+        .with({ status: "loading" }, () => "読み込み中")
+        .with({ status: "success" }, ({ data }) => data.name)
+        .with({ status: "error" }, ({ error }) => renderError(error))
+        .exhaustive();
+};
 ```
 
-### 短絡評価
-
-- `||` や `&&` を条件分岐として使うことは禁止
-
-### 再帰
-
-- ループの代わりに再帰を使うことは禁止
-
-### Discriminated Union の網羅性は `assertNever` で担保する
-
-- if文の連鎖で discriminated union を分岐する場合、すべてのタグを処理したことを型レベルで保証する
-- ユニオンに新しいタグが追加されたとき、コンパイルエラーで処理漏れに気付ける
+依存を追加できないファイル（vendored utils 等）では if + 早期 return + `assertNever` を代替として使う:
 
 ```ts
 const assertNever = (value: never): never => {
     throw new Error(`Unexpected value: ${JSON.stringify(value)}`);
 };
-
-type FetchState =
-    | { status: "idle" }
-    | { status: "loading" }
-    | { status: "success"; data: User }
-    | { status: "error"; error: Error };
-
-const render = (state: FetchState): string => {
-    if (state.status === "idle") {
-        return "待機中";
-    }
-
-    if (state.status === "loading") {
-        return "読み込み中";
-    }
-
-    if (state.status === "success") {
-        return state.data.name;
-    }
-
-    if (state.status === "error") {
-        return state.error.message;
-    }
-
-    return assertNever(state);
-};
 ```
+
+## 反復処理
+
+for / for-in / for-of / do-while / forEach は使用しない（ast-grep / Biome）。語彙の使い分け:
+
+- **変換**: `map` / **絞り込み**: `filter`（型の絞り込みは `isDefined` 等の型ガードを参照で渡す）
+- **変換して初めて成否が判る（parse 系）**: `filterMap`（vendored array.ts。実体は `map(f).filter(isDefined)` の合成）。単なる条件 + 変換は filter -> map に分ける
+- **0..n 展開**: `flatMap`
+- **グルーピング**: `Object.groupBy` / `Map.groupBy`（値は undefined を含みうる点に注意）
+- **オブジェクト構築**: `Object.fromEntries` + `map`（reduce + spread で畳まない: O(n²)）
+- **長いチェーン・大きい列・early-exit**: Iterator helpers（`items.values().filter(p).map(f).take(n).toArray()`）。遅延評価で中間配列を作らない（Node 22+ / ES2025）。イテレータは一回消費なので中間イテレータを変数に置かず終端操作まで一気に書く。ブラウザ対象では baseline（Safari 18.4+ 等）を確認する
+- **上記で書けない fold（数値集約等）**: `reduce`（最終手段）
+
+コールバックの規約:
+
+- インラインコールバック内で分岐しない（ast-grep no-branching-in-callback）。分岐が要るなら名前付き関数に抽出して参照で渡す
+- 1つのコールバックには1つの責務（判定は filter、変換は map）。map を副作用に使わない（design-policy.md）
+
+反復の境界:
+
+- **回数不定の反復**（リトライ / ページネーション / ポーリング）はライブラリ（p-retry, p-limit 等）へ委譲する。該当ライブラリが無い場合のみ、I/O アダプタ層（`adapters/` / `*.adapter.ts`）で `while` を許可（ast-grep no-while-outside-adapter）
+- **逐次 await**（レートリミット等で並列にできない I/O）はアダプタ層でのみ `for...of` を許可する（ast-grep no-for-of-outside-adapter）。アダプタ層ではループ状態のための `let` も許可される（no-let の ignores）
+- 再帰は**データ構造の再帰的形状に沿う場合**（木・入れ子構造）のみ許可。制御フローの代替としての再帰（リトライ等）は禁止。ジェネレータは使わない
 
 ## エラー処理
 
-### `throw` ではなく `Result<T, E>` を返す
+### 期待される失敗は Result、バグは throw
 
-- 関数の失敗は戻り値の型で表現する
-- `throw` はシグネチャに現れず、呼び出し側が失敗の可能性を見落としやすい
-- 失敗の可能性がある関数は `Result` 型を返す
+- **期待される失敗**（ドメインの正常な結果の一種: パース失敗・検証エラー・not found 等）は `Result<T, E>` で返す
+- **プログラムのバグ**（到達不能パス・不変条件違反）は throw で即死させる。Result に包まない（スタックトレースを保つ）
+- 実装は vendored result.ts（ok / err / map / andThen / match / all / partition / fromThrowable / fromPromise）を使う。plain object なのでシリアライズ可能
+
+### エラー型の規約
+
+- E は `kind` タグ付き discriminated union。メッセージ文字列ではなくデータを持たせ、文言化は境界（UI / ログ）で行う
+- `Error` インスタンスは境界のみ。throw する外部ライブラリは `fromThrowable` / `fromPromise` で Result に変換する。原因の保持が必要なら `cause: unknown` フィールドに入れる
 
 ```ts
-type Result<T, E> =
-    | { ok: true; value: T }
-    | { ok: false; error: E };
+type FetchError =
+    | { kind: "network"; cause: unknown }
+    | { kind: "http"; statusCode: number };
+```
 
-// NG: 関数シグネチャから失敗が見えない
-const parseUser = (input: string): User => {
-    if (!isValid(input)) {
-        throw new Error("invalid");
+### async の合成は await + 早期 return
+
+`Promise<Result<T, E>>` のチェーンは await して失敗を早期 return する（Rust の `?` を手で展開した形）。async 用のコンビネータ（ResultAsync 等）は作らない。
+
+```ts
+const showUser = async (
+    id: UserId,
+    deps: Deps,
+): Promise<Result<string, FetchError>> => {
+    const user = await fetchUser(id, deps);
+
+    if (!user.ok) {
+        return user;
     }
 
-    return toUser(input);
-};
-
-// OK: 失敗が型に現れる
-const parseUser = (input: string): Result<User, ParseError> => {
-    if (!isValid(input)) {
-        return { ok: false, error: { kind: "invalid", input } };
-    }
-
-    return { ok: true, value: toUser(input) };
+    return ok(formatUser(user.value));
 };
 ```
 
-#### `throw` を許容する例外
-
-- I/O境界でフレームワークが例外を要求する場合
-- プログラムのバグを示す即死パス（`assertNever` 等の到達不能パス）
-- 外部ライブラリが `throw` する場合は境界で `Result` に変換する
-
-## ループ処理
-
-### 逐次処理は禁止し、高階関数を使う
-
-以下の逐次処理は使用しない:
-
-- for / while / do-while / for-in / for-of / Array#forEach
-
-代わりに `map`, `filter`, `reduce` 等の高階関数を使用する。
-
-### 高階関数は1つのコールバックにつき1つの責務
-
-- **map**: 変換（AをBに変える）
-- **filter**: 絞り込み（条件に合うものだけ残す）
-
-コールバック内に条件分岐が出てきたら、それはfilterに分離すべきサイン。
-
-```ts
-// NG: mapの中で判定と変換を同時にやっている
-items.map((item) => {
-    return item.isActive ? item.name : "";
-})
-
-// OK: filterで絞る、mapで取り出す
-items.filter((item) => {
-    return item.isActive;
-}).map((item) => {
-    return item.name;
-})
-```
-
-### 高階関数に渡すコールバック内でif文は禁止
+並列でよい I/O の fan-out は `Promise.all(items.map(async ...))` を正規手段とする（Promise の構築は「map を副作用に使わない」ルールの公認例外。design-policy.md 参照）。結果の集約は result.ts の `all` / `partition` で行い、並列度制御・逐次化は p-limit（逐次は `limit(1)` かアダプタ層の for-of）へ委譲する。
 
 ## イミュータビリティ
 
-### 破壊的なメソッド・APIを使用しない
-
-`const` だけではオブジェクトや配列の中身の変更を防げない。以下の破壊的APIは使用しない:
-
-- `Array#push` / `pop` / `shift` / `unshift`
-- `Array#splice` / `sort` / `reverse` / `fill` / `copyWithin`
-- `Object.assign(target, ...)` の第一引数を変更する用法
-- プロパティへの直接代入による変更（`obj.x = y`）
-
-代わりに非破壊APIを使う:
-
-- スプレッド構文（`[...arr, x]`, `{ ...obj, key: value }`）
-- ES2023 非破壊メソッド（`toSorted`, `toReversed`, `toSpliced`, `with`）
-- `Object.assign({}, ...)` のように新規オブジェクトを生成する形
-
-```ts
-// NG
-arr.push(x);
-arr.sort();
-Object.assign(obj, { key: "value" });
-obj.x = y;
-
-// OK
-const next = [...arr, x];
-const sorted = arr.toSorted();
-const merged = { ...obj, key: "value" };
-const updated = { ...obj, x: y };
-```
+- 破壊的 API は使用しない（ast-grep）。スプレッド / `toSorted` / `toReversed` / `toSpliced` / `with` / `Object.assign({}, ...)` を使う
+- **局所ミューテーションの例外（二層制）**。いずれも関数の外から観測されないことが前提で、suppression コメントに理由を書く:
+  1. **アルゴリズム的必然**（visited Set / メモ化 Map / インデックス構築など標準語彙で直接表現できないもの）: 理由コメントのみで可
+  2. **性能目的**（標準語彙で書けるが遅い場合）: 計測結果を添えることが条件
+- Map / Set はドメインデータに使わない（Record を使う。Map / Set には非破壊 API が無い）。使ってよいのは関数内部に閉じたアルゴリズム用途のみ
+- readonly は公開関数の引数と公開型に付ける。モジュール内の const で閉じた型には不要（`as const satisfies` で担保する）
 
 ## export / import
 
-### named exportを使用する（default export禁止）
-
-- BiomeのnoDefaultExportルールで強制する
-- 設定ファイル等、default exportが必須の場合は `biome-ignore` で理由を付けて除外する
-
-### exportは宣言時に行う（推奨）
-
-- リンターでは強制できないため推奨扱い
-- barrel file（index.tsでのre-export）や循環参照回避の場合は末尾exportを許容する
-
-```ts
-// 推奨: 宣言時にexport
-export const greet = (name: string): string => {
-    return `Hello, ${name}`;
-};
-
-// 末尾exportはbarrel file等の例外時のみ
-export { greet } from "./greet.js";
-```
+- named export のみ（Biome noDefaultExport）。宣言時 export を推奨、barrel file は例外時のみ
+- type-only import は `import type`（tsconfig verbatimModuleSyntax + Biome useImportType）
 
 ## 型定義
 
-### `any` を使用せず、境界では `unknown` を使う
-
-- `any` は型チェックを無効化するため使用しない
-- 外部入力など型が確定していない値は `unknown` で受け取り、型ガード（`is` predicate）またはスキーマパースで絞り込む
-
-```ts
-// NG
-const handle = (input: any) => {
-    return input.name;
-};
-
-// OK
-const isUser = (input: unknown): input is User => {
-    return typeof input === "object"
-        && input !== null
-        && "name" in input
-        && typeof (input as Record<string, unknown>).name === "string";
-};
-
-const handle = (input: unknown): string | undefined => {
-    if (isUser(input)) {
-        return input.name;
-    }
-
-    return undefined;
-};
-```
-
-### 関数型にはtype aliasを使う
-
-- 型の意図を名前で表現し、インラインの関数型シグネチャを避ける
-
-```ts
-// NG
-type Config = {
-    validate: (input: string) => boolean;
-    format: (input: string) => string;
-};
-
-// OK
-type Validator = (input: string) => boolean;
-type Formatter = (input: string) => string;
-
-type Config = {
-    validate: Validator;
-    format: Formatter;
-};
-```
-
-### 型から推論できる場合は型注釈を省略する
-
-- 型定義やsatisfiesで型が確定している場合、コールバックの引数に型注釈を重複して書かない
-
-```ts
-type Handler = (input: string) => boolean;
-
-type Config = {
-    handler: Handler;
-    name: string;
-};
-
-// NG: Config型からhandlerの引数型は推論できるのに重複して書いている
-const configs = [
-    {
-        handler: (input: string) => {
-            return input.length > 0;
-        },
-        name: "notEmpty",
-    },
-] as const satisfies readonly Config[];
-
-// OK: 型推論に任せる
-const configs = [
-    {
-        handler: (input) => {
-            return input.length > 0;
-        },
-        name: "notEmpty",
-    },
-] as const satisfies readonly Config[];
-```
-
-### 型定義はテストファイルではなく実装側で管理する
-
-- ドメインの型定義をテストファイルに置かない
+- `any` 不使用。型が確定しない外部入力は `unknown` で受け、型ガードかスキーマパースで絞り込む（Biome noExplicitAny）
+- 関数型は type alias で名前を付ける（インラインの関数型シグネチャを避ける）
+- 型から推論できる注釈は書かない（`as const satisfies` で型が確定しているコールバック引数等）
+- ドメインの型定義はテストファイルではなく実装側に置く
 
 ## 定数定義
 
-### イミュータブルな定数には `as const satisfies readonly T[]` を使用する
-
-- モジュール外にexportする定数、または複数箇所から参照される定数配列/オブジェクトが対象
-- `as const satisfies` を使う場合、`readonly` は必ずセットで付ける（付けないとコンパイルエラーになる）
-
-```ts
-type StatusLabel = {
-    code: string;
-    label: string;
-};
-
-const statuses = [
-    {
-        code: "active",
-        label: "有効",
-    },
-
-    {
-        code: "inactive",
-        label: "無効",
-    },
-] as const satisfies readonly StatusLabel[];
-```
+exported または複数箇所から参照される定数配列 / オブジェクトは `as const satisfies readonly T[]` を使う（readonly は必須セット）。
 
 ## コメント
 
-### JSDocスタイルのコメントを使用する
-
-- 関数、型定義（type/interface）にはJSDocスタイルのコメントを付ける
-- 1行の説明でも3行形式（`/**` / ` *` / ` */`）で書く
-- コメント内の矢印は `->` `<-` を使用する（`→` `←` 等のUnicode矢印は使わない）
-
-```ts
-/**
- * ユーザー名を整形して返す
- */
-export const formatUserName = (firstName: string, lastName: string): string => {
-    return `${lastName} ${firstName}`;
-};
-
-/**
- * ユーザー情報
- */
-type User = {
-    name: string;
-    age: number;
-};
-```
+- **JSDoc は exported シンボル（関数・型）に必須**。1行でも3行形式（`/**` / ` *` / ` */`）で書く。モジュール内部のコメントは code-style.md の方針（自明なら書かない）に従う — 競合時は本ルールが優先
+- 既存コードの exported シンボルへの JSDoc 追加は契約の文書化として可（「既存コードにコメントを追加しない」の例外）
+- コメント内の矢印は `->` `<-` を使う（Unicode 矢印は使わない）
 
 ## フォーマット
 
-### 空行ルール
+- 同一オブジェクト内のプロパティは詰め、配列内のオブジェクト間には空行を入れる
+- if ブロックの前後に空行を入れる
 
-- 同一オブジェクト内のプロパティは詰める
-- 配列内のオブジェクト間には必ず空行を入れる
+## 標準依存
 
-```ts
-// NG
-const items = [
-    {
-        name: "Alice",
-        age: 30,
-    },
-    {
-        name: "Bob",
-        age: 25,
-    },
-];
+この規約で標準採用済みのライブラリ（導入時の個別確認は不要）:
 
-// OK
-const items = [
-    {
-        name: "Alice",
-        age: 30,
-    },
-
-    {
-        name: "Bob",
-        age: 25,
-    },
-];
-```
-
-### readonly修飾子
-
-- モジュール内のconstで閉じた型にreadonlyは付けない（ノイズになるだけ）
-- `as const satisfies` で十分にイミュータブル性は担保される
+- **ts-pattern**: DU 分岐
+- **zod**: スキーマパース（フロントエンドはバンドルサイズに応じて zod/mini を検討）
+- **p-retry / p-limit**: 回数不定の反復・並列度制御
+- **vendored**: result.ts / array.ts / schema.ts を coding-style リポの src/ からコピーする（コントラクト層を厳密に、実装層は再生成可能に保つ）

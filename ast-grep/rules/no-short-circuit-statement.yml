@@ -1,0 +1,26 @@
+id: no-short-circuit-statement
+language: TypeScript
+severity: error
+message: 短絡評価（&& / ||）を文として使わない（分岐は if で書く）
+note: |-
+  `cond && run();` は `if (cond) { run(); }` で書く。
+  値のフォールバック（a ?? b / a || b）は式の位置でのみ使う。
+rule:
+  kind: expression_statement
+  has:
+    kind: binary_expression
+    has:
+      field: operator
+      regex: '^(&&|\|\|)$'
+---
+id: no-short-circuit-statement-tsx
+language: Tsx
+severity: error
+message: 短絡評価（&& / ||）を文として使わない（分岐は if で書く）
+rule:
+  kind: expression_statement
+  has:
+    kind: binary_expression
+    has:
+      field: operator
+      regex: '^(&&|\|\|)$'

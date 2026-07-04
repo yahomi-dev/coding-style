@@ -1,0 +1,15 @@
+id: no-member-mutation-tsx
+valid:
+  - |
+    const updated = { ...user, name: "Alice" };
+  - |
+    timerRef.current = id;
+  - |
+    countRef.current += 1;
+  - |
+    countRef.current++;
+invalid:
+  - |
+    user.name = "Alice";
+  - |
+    obj.current = id;

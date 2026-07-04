@@ -1,0 +1,9 @@
+id: no-object-assign-mutation
+valid:
+  - |
+    const merged = Object.assign({}, base, patch);
+  - |
+    const merged = { ...base, ...patch };
+invalid:
+  - |
+    Object.assign(base, patch);

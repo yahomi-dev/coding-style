@@ -1,0 +1,31 @@
+id: no-as-cast
+language: TypeScript
+severity: error
+ignores:
+  - "**/*.parse.ts"
+  - "**/parse/**"
+message: as キャストは境界パーサ（*.parse.ts / parse/）でのみ使用できる（as const は除く）
+note: |-
+  型の検査には satisfies、契約の宣言には型注釈を使う。
+  brand 付与を行うスマートコンストラクタは *.parse.ts に置く（型の入り口 = パーサ）。
+  外部入力は unknown で受け、Zod でパースして型を獲得する。
+rule:
+  any:
+    - all:
+        - kind: as_expression
+        - not:
+            regex: 'as\s+const\s*$'
+    - kind: type_assertion
+---
+id: no-as-cast-tsx
+language: Tsx
+severity: error
+ignores:
+  - "**/*.parse.tsx"
+  - "**/parse/**"
+message: as キャストは境界パーサ（*.parse.ts / parse/）でのみ使用できる（as const は除く）
+rule:
+  all:
+    - kind: as_expression
+    - not:
+        regex: 'as\s+const\s*$'

@@ -1,0 +1,14 @@
+id: no-switch
+valid:
+  - |
+    if (state.status === "idle") {
+      return "waiting";
+    }
+invalid:
+  - |
+    switch (state.status) {
+      case "idle":
+        return "waiting";
+      default:
+        return "unknown";
+    }

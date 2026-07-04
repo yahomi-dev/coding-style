@@ -1,0 +1,26 @@
+id: no-member-mutation
+valid:
+  - |
+    const updated = { ...user, name: "Alice" };
+  - |
+    const next = items.with(0, replacement);
+  # /Ref$/ 命名の .current 書き込みは mutable ref パターンとして除外される
+  - |
+    timerRef.current = id;
+  - |
+    countRef.current += 1;
+  - |
+    countRef.current++;
+invalid:
+  - |
+    user.name = "Alice";
+  - |
+    items[0] = replacement;
+  - |
+    counter.value += 1;
+  - |
+    counter.value++;
+  - |
+    delete user.name;
+  - |
+    obj.current = id;

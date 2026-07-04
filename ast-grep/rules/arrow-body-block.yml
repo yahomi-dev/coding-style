@@ -1,0 +1,41 @@
+id: arrow-body-block
+language: TypeScript
+severity: error
+message: 宣言に束縛するアロー関数はブロック本体 + 明示 return で書く
+note: |-
+  式本体（ブロック省略）が許されるのは、呼び出しの引数か
+  オブジェクトプロパティに直接書くインラインコールバックのみ。
+  例: `items.map((n) => n * 2)` は可、`const double = (n) => n * 2` は不可。
+rule:
+  all:
+    - kind: arrow_function
+    - not:
+        has:
+          field: body
+          kind: statement_block
+    - not:
+        inside:
+          any:
+            - kind: arguments
+            - kind: pair
+---
+id: arrow-body-block-tsx
+language: Tsx
+severity: error
+message: 宣言に束縛するアロー関数はブロック本体 + 明示 return で書く
+note: |-
+  式本体が許されるのは、呼び出しの引数・オブジェクトプロパティ・
+  JSX 属性（イベントハンドラ等）に直接書くインラインコールバックのみ。
+rule:
+  all:
+    - kind: arrow_function
+    - not:
+        has:
+          field: body
+          kind: statement_block
+    - not:
+        inside:
+          any:
+            - kind: arguments
+            - kind: pair
+            - kind: jsx_expression

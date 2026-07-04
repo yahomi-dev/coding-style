@@ -8,15 +8,28 @@
 		"check": "biome check .",
 		"format": "biome check --write .",
 		"lint": "biome lint .",
+		"scan": "ast-grep scan",
+		"test": "vitest run",
+		"test:rules": "ast-grep test --skip-snapshot-tests",
 		"prepare": "lefthook install"
+	},
+	"packageManager": "pnpm@10.14.0",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@ast-grep/cli",
+			"lefthook"
+		]
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@biomejs/biome": "^2.4.8",
+		"@ast-grep/cli": "^0.44.1",
+		"@biomejs/biome": "^2.5.2",
 		"lefthook": "^2.1.4",
+		"ts-pattern": "^5.9.0",
 		"typescript": "^5.9.3",
-		"vitest": "^4.1.1"
+		"vitest": "^4.1.1",
+		"zod": "^4.4.3"
 	}
 }

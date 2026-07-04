@@ -1,0 +1,23 @@
+id: no-while-outside-adapter
+language: TypeScript
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.ts"
+message: while は I/O アダプタ層でのみ使用できる
+note: |-
+  回数不定の反復はまずライブラリ（p-retry, p-limit 等）へ委譲する。
+  該当ライブラリが無い場合のみ、**/adapters/** か *.adapter.ts に置いた
+  アダプタ関数の中で while を使う。純粋ロジック層では使用しない。
+rule:
+  kind: while_statement
+---
+id: no-while-outside-adapter-tsx
+language: Tsx
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.tsx"
+message: while は I/O アダプタ層でのみ使用できる
+rule:
+  kind: while_statement

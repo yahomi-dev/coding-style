@@ -1,0 +1,21 @@
+id: no-ternary-statement
+language: TypeScript
+severity: error
+message: 三項演算子を文として使わない（式の位置での値の選択のみ）
+note: |-
+  三項演算子は const 初期化 / return / 引数など、式の位置での
+  boolean -> 値の選択に限る。副作用の実行を分岐する
+  `cond ? doA() : doB();` は if 文で書く。
+rule:
+  kind: expression_statement
+  has:
+    kind: ternary_expression
+---
+id: no-ternary-statement-tsx
+language: Tsx
+severity: error
+message: 三項演算子を文として使わない（式の位置での値の選択のみ）
+rule:
+  kind: expression_statement
+  has:
+    kind: ternary_expression

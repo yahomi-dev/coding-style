@@ -1,0 +1,17 @@
+id: arrow-body-block
+valid:
+  - |
+    const double = (n: number): number => {
+      return n * 2;
+    };
+  - |
+    const names = users.filter((u) => u.isActive).map((u) => u.name);
+  - |
+    const config = {
+      handler: (input: string) => input.length,
+    };
+  - |
+    const merged = items.map((item) => ({ ...item, active: true }));
+invalid:
+  - |
+    const double = (n: number): number => n * 2;

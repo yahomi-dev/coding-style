@@ -1,0 +1,15 @@
+id: no-short-circuit-statement
+valid:
+  - |
+    const both = a && b;
+  - |
+    const name = input || "unknown";
+  - |
+    if (a && b) {
+      run();
+    }
+invalid:
+  - |
+    cond && run();
+  - |
+    cond || fallback();

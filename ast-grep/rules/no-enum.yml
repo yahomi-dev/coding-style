@@ -1,0 +1,16 @@
+id: no-enum
+language: TypeScript
+severity: error
+message: enum は使用しない（ユニオン型か as const で代替する）
+note: |-
+  tsconfig の erasableSyntaxOnly でも言語レベルで禁止している。
+  ラベルと値のペアが必要なら `as const satisfies` の定数配列を使う。
+rule:
+  kind: enum_declaration
+---
+id: no-enum-tsx
+language: Tsx
+severity: error
+message: enum は使用しない（ユニオン型か as const で代替する）
+rule:
+  kind: enum_declaration

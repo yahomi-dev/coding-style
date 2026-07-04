@@ -1,0 +1,10 @@
+id: no-enum
+valid:
+  - |
+    type Color = "red" | "blue";
+invalid:
+  - |
+    enum Color {
+      Red,
+      Blue,
+    }

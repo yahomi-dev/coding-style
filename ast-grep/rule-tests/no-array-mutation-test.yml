@@ -1,0 +1,19 @@
+id: no-array-mutation
+valid:
+  - |
+    const next = [...items, item];
+  - |
+    const sorted = items.toSorted(byName);
+  - |
+    const reversed = items.toReversed();
+invalid:
+  - |
+    items.push(item);
+  - |
+    items.pop();
+  - |
+    items.sort();
+  - |
+    items.splice(1, 2);
+  - |
+    items.reverse();

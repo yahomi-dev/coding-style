@@ -47,7 +47,8 @@ type Rule = {
 
 - 複数ルールの組み合わせ結果を、別のルールとして定義しない
 - 個々のルールを独立して定義し、`filter`+`map`+`join`等の合成で結果を導出する
-- `find` で最初の1つだけを取る設計は、組み合わせパターンが増えるほどルールが爆発するため避ける
+- 組み合わせ結果の導出で `find` により最初の1つだけを取る設計は、パターンが増えるほどルールが爆発するため避ける
+- first-match がドメイン仕様そのもの（優先度順の閾値判定、最初の失敗の検出等）の場合は、`find` が意図を最も正確に表すので使ってよい
 
 ## 副作用の分離
 
@@ -55,7 +56,7 @@ type Rule = {
 
 - ロジックを担う関数は純粋関数として実装する
 - 入出力（console.log、API呼び出し、ファイル操作等）はエントリポイントやアダプタ層で行う
-- mapを副作用の実行に使用しない（mapは変換用）
+- mapを副作用の実行に使用しない（mapは変換用）。例外: 並列 I/O の fan-out `Promise.all(items.map(async ...))` は公認イディオム（typescript.md の async 規約を参照）
 
 ## テスト戦略
 
@@ -64,6 +65,7 @@ type Rule = {
 ### 古典学派 (Detroit school) に従う
 
 - 検証は state-based / value-based で行う（「何が呼ばれたか」ではなく「何が返ったか」）
+- 値の比較は `toStrictEqual` を既定にする（`toEqual` は undefined 値のプロパティを無視するため、`exactOptionalPropertyTypes` で区別している「不在 vs undefined」の差を検出できない）
 - 呼び出し履歴を verify するロンドン学派 (mockist) は採らない
 - そもそも class / メソッドが存在しないため、相互作用検証する対象が構造的に無い
 
@@ -82,15 +84,28 @@ const greet = async (
     // ...
 };
 
+// テスト設定用: branded type はテストでもスマートコンストラクタで作る（as は使わない）。
+// パース失敗はテスト設定のバグなので throw で即死。
+// コールバック内 if 禁止のため、unwrap はモジュールレベルの関数に抽出する
+const mustParseUserId = (raw: string): UserId => {
+    const parsed = parseUserId(raw);
+
+    if (!parsed.ok) {
+        throw new Error(`test setup: invalid UserId: ${raw}`);
+    }
+
+    return parsed.value;
+};
+
 // テスト: Stub を関数として渡すだけ。Mock ライブラリ不要
 test("ユーザー名で挨拶を返す", async () => {
     const fetchUser: FetchUser = async (id) => {
         return { ok: true, value: { id, name: "Alice" } };
     };
 
-    const result = await greet("u1" as UserId, { fetchUser });
+    const result = await greet(mustParseUserId("u1"), { fetchUser });
 
-    expect(result).toEqual({ ok: true, value: "Hello, Alice" });
+    expect(result).toStrictEqual({ ok: true, value: "Hello, Alice" });
 });
 ```
 
@@ -113,5 +128,6 @@ test("ユーザー名で挨拶を返す", async () => {
 
 ### 型レベルテストで型契約を守る
 
-- Branded Type / Discriminated Union / `Result<T, E>` 等の型契約自体を `expect-type` で検証する
+- Branded Type / Discriminated Union / `Result<T, E>` 等の型契約自体を vitest 内蔵の `expectTypeOf` で検証する（expect-type の別途導入は不要）
+- `expectTypeOf` の検査はコンパイル時にのみ効く。テストファイルが tsc の型検査対象に入っていること（または `vitest --typecheck` で実行されること）を構成で保証する
 - 「Parse, Don't Validate」の境界では、parser テストが型システムへの入り口の防衛線になる

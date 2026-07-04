@@ -1,0 +1,24 @@
+id: no-loops
+valid:
+  - |
+    const doubled = items.map((n) => n * 2);
+  - |
+    const total = items.reduce(add, 0);
+  # for-of はこのルールの対象外（no-for-of-outside-adapter が扱う）
+  - |
+    for (const item of items) {
+      handle(item);
+    }
+invalid:
+  - |
+    for (const key in obj) {
+      handle(key);
+    }
+  - |
+    for (const i = 0; i < 10; i = i + 1) {
+      handle(i);
+    }
+  - |
+    do {
+      poll();
+    } while (pending);

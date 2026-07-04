@@ -1,0 +1,11 @@
+id: no-let
+valid:
+  - |
+    const a = 1;
+  - |
+    const items = [1, 2, 3];
+invalid:
+  - |
+    let a = 1;
+  - |
+    let a;

@@ -1,0 +1,9 @@
+id: no-while-outside-adapter
+valid:
+  - |
+    const results = pages.map(fetchPage);
+invalid:
+  - |
+    while (hasNext) {
+      fetchNext();
+    }

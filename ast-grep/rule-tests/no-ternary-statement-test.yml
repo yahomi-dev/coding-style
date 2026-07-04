@@ -1,0 +1,13 @@
+id: no-ternary-statement
+valid:
+  - |
+    const label = isActive ? "on" : "off";
+  - |
+    const pick = (cond: boolean): string => {
+      return cond ? "a" : "b";
+    };
+  - |
+    log(cond ? "a" : "b");
+invalid:
+  - |
+    cond ? doA() : doB();

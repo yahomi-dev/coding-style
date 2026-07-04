@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -15,15 +15,29 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
+			"complexity": {
+				"noForEach": "on"
+			},
+			"suspicious": {
+				"noVar": "error"
+			},
 			"style": {
 				"noDefaultExport": "on",
+				"noEnum": "on",
+				"noNamespace": "on",
+				"noNestedTernary": "on",
+				"noNonNullAssertion": "on",
+				"noParameterAssign": "on",
+				"useBlockStatements": "on",
 				"useConsistentTypeDefinitions": {
 					"level": "error",
 					"options": {
 						"style": "type"
 					}
-				}
+				},
+				"useConst": "on",
+				"useImportType": "on"
 			}
 		}
 	},

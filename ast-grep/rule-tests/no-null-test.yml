@@ -1,0 +1,19 @@
+id: no-null
+valid:
+  - |
+    if (element === null) {
+      return undefined;
+    }
+  - |
+    const isAbsent = value == null;
+  - |
+    const found = items.find(isTarget) !== null;
+invalid:
+  - |
+    const a = null;
+  - |
+    callback(null);
+  - |
+    type Name = string | null;
+  - |
+    const fallback = value ?? null;

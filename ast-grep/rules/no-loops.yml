@@ -1,0 +1,33 @@
+id: no-loops
+language: TypeScript
+severity: error
+message: for / for-in / do-while は使用しない（高階関数で表現する）
+note: |-
+  変換は map、絞り込みは filter、グルーピングは Object.groupBy / Map.groupBy、
+  大きい列や early-exit は Iterator helpers（.values().filter().take() 等）を使う。
+  for-of は別ルール no-for-of-outside-adapter が扱う（アダプタ層の逐次 await のみ許可）。
+  回数不定の反復はライブラリ（p-retry, p-limit 等）へ委譲し、
+  無い場合のみ I/O アダプタ層（**/adapters/**, *.adapter.ts）で while を使う。
+rule:
+  any:
+    - kind: for_statement
+    - kind: do_statement
+    - all:
+        - kind: for_in_statement
+        - has:
+            field: operator
+            regex: ^in$
+---
+id: no-loops-tsx
+language: Tsx
+severity: error
+message: for / for-in / do-while は使用しない（高階関数で表現する）
+rule:
+  any:
+    - kind: for_statement
+    - kind: do_statement
+    - all:
+        - kind: for_in_statement
+        - has:
+            field: operator
+            regex: ^in$

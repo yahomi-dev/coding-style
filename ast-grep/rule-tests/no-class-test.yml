@@ -1,0 +1,23 @@
+id: no-class
+valid:
+  - |
+    type User = {
+      name: string;
+    };
+invalid:
+  - |
+    class UserService {
+      run() {
+        return 1;
+      }
+    }
+  - |
+    const Service = class {
+      run() {
+        return 1;
+      }
+    };
+  - |
+    abstract class BaseService {
+      abstract run(): number;
+    }

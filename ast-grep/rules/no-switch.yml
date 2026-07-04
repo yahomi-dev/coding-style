@@ -1,0 +1,16 @@
+id: no-switch
+language: TypeScript
+severity: error
+message: switch は使用しない
+note: |-
+  discriminated union の分岐は ts-pattern の match().exhaustive() を正規手段とする。
+  依存を追加できないファイルでは if + 早期 return + assertNever で代替する。
+rule:
+  kind: switch_statement
+---
+id: no-switch-tsx
+language: Tsx
+severity: error
+message: switch は使用しない
+rule:
+  kind: switch_statement

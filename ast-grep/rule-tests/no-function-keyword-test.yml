@@ -1,0 +1,31 @@
+id: no-function-keyword
+valid:
+  - |
+    const greet = (name: string): string => {
+      return name;
+    };
+  - |
+    const config = {
+      handler: (input: string) => {
+        return input.length;
+      },
+    };
+invalid:
+  - |
+    function greet(name) {
+      return name;
+    }
+  - |
+    const greet = function (name) {
+      return name;
+    };
+  - |
+    function* numbers() {
+      yield 1;
+    }
+  - |
+    const obj = {
+      greet(name) {
+        return name;
+      },
+    };

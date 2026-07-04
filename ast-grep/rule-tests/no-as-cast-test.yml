@@ -1,0 +1,15 @@
+id: no-as-cast
+valid:
+  - |
+    const statuses = ["active", "inactive"] as const;
+  - |
+    const config = {
+      name: "app",
+    } as const satisfies AppConfig;
+invalid:
+  - |
+    const user = response as User;
+  - |
+    const name = <string>value;
+  - |
+    const anything = value as unknown as User;

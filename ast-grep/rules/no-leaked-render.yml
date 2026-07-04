@@ -1,0 +1,19 @@
+id: no-leaked-render
+language: Tsx
+severity: error
+message: JSX の && による条件描画は使用しない（三項で書く）
+note: |-
+  `{count && <X />}` は count が 0 のとき "0" を描画する（leaked render）。
+  `{count > 0 ? <X /> : undefined}` のように三項 + undefined で書く。
+  props 内の boolean 計算（disabled={a && b} 等）は対象外。
+rule:
+  all:
+    - kind: jsx_expression
+    - not:
+        inside:
+          kind: jsx_attribute
+    - has:
+        kind: binary_expression
+        has:
+          field: operator
+          regex: ^&&$

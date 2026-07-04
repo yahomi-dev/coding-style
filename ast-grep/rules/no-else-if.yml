@@ -1,0 +1,20 @@
+id: no-else-if
+language: TypeScript
+severity: error
+message: else if は使用しない（早期 return で分岐を平坦化する）
+note: |-
+  if ブロック内で return し、次の条件は独立した if として書く。
+  値の網羅的な分岐なら ts-pattern の match().exhaustive() を使う。
+rule:
+  kind: else_clause
+  has:
+    kind: if_statement
+---
+id: no-else-if-tsx
+language: Tsx
+severity: error
+message: else if は使用しない（早期 return で分岐を平坦化する）
+rule:
+  kind: else_clause
+  has:
+    kind: if_statement

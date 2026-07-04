@@ -1,0 +1,33 @@
+id: no-branching-in-callback
+valid:
+  - |
+    const names = items.filter(isActive).map(toName);
+  - |
+    const doubled = items.map((n) => {
+      return n * 2;
+    });
+  - |
+    const parsed = items.map(parseItem).filter(isDefined);
+  - |
+    describe("group", () => {
+      const helper = (n: number): string => {
+        if (n > 0) {
+          return "positive";
+        }
+
+        return "other";
+      };
+
+      it("uses helper", () => {
+        expect(helper(1)).toBe("positive");
+      });
+    });
+invalid:
+  - |
+    const labels = items.map((item) => {
+      if (item.isActive) {
+        return item.name;
+      }
+
+      return "";
+    });

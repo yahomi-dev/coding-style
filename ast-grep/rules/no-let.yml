@@ -1,0 +1,28 @@
+id: no-let
+language: TypeScript
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.ts"
+message: let は使用しない（const のみ）
+note: |-
+  再代入したくなったら、値の導出を関数に抽出して const で受ける。
+  条件による値の選択は非ネスト三項か、if + return の関数抽出で行う。
+  例外: I/O アダプタ層（**/adapters/**, *.adapter.ts）は while / for-of の
+  ループ状態（カウンタ / カーソル等）に let が必要なため対象外。
+rule:
+  kind: lexical_declaration
+  regex: ^let\b
+---
+id: no-let-tsx
+language: Tsx
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.tsx"
+message: let は使用しない（const のみ）
+note: |-
+  再代入したくなったら、値の導出を関数に抽出して const で受ける。
+rule:
+  kind: lexical_declaration
+  regex: ^let\b

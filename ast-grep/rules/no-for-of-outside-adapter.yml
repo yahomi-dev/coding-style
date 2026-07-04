@@ -1,0 +1,32 @@
+id: no-for-of-outside-adapter
+language: TypeScript
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.ts"
+message: for-of は I/O アダプタ層の逐次 await でのみ使用できる
+note: |-
+  純粋ロジックの反復は map / filter 等の高階関数で書く。
+  並列でよい I/O は Promise.all(items.map(async ...)) を使い、
+  並列度制御は p-limit へ委譲する。レートリミット等で逐次実行が必須の
+  I/O のみ、アダプタ層（**/adapters/**, *.adapter.ts）で for-of + await を使う。
+rule:
+  all:
+    - kind: for_in_statement
+    - has:
+        field: operator
+        regex: ^of$
+---
+id: no-for-of-outside-adapter-tsx
+language: Tsx
+severity: error
+ignores:
+  - "**/adapters/**"
+  - "**/*.adapter.tsx"
+message: for-of は I/O アダプタ層の逐次 await でのみ使用できる
+rule:
+  all:
+    - kind: for_in_statement
+    - has:
+        field: operator
+        regex: ^of$

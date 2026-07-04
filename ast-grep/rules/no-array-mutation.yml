@@ -1,0 +1,36 @@
+id: no-array-mutation
+language: TypeScript
+severity: error
+message: 破壊的メソッドは使用しない（非破壊 API で新しい配列を作る）
+note: |-
+  push -> [...arr, x] / sort -> toSorted / reverse -> toReversed /
+  splice -> toSpliced / 要素置換 -> with を使う。
+  局所ミューテーションの例外条件（typescript.md）を満たす場合は
+  前行に `// ast-grep-ignore: no-array-mutation` と理由を書いて除外する。
+rule:
+  any:
+    - pattern: $A.push($$$)
+    - pattern: $A.pop($$$)
+    - pattern: $A.shift($$$)
+    - pattern: $A.unshift($$$)
+    - pattern: $A.splice($$$)
+    - pattern: $A.sort($$$)
+    - pattern: $A.reverse($$$)
+    - pattern: $A.fill($$$)
+    - pattern: $A.copyWithin($$$)
+---
+id: no-array-mutation-tsx
+language: Tsx
+severity: error
+message: 破壊的メソッドは使用しない（非破壊 API で新しい配列を作る）
+rule:
+  any:
+    - pattern: $A.push($$$)
+    - pattern: $A.pop($$$)
+    - pattern: $A.shift($$$)
+    - pattern: $A.unshift($$$)
+    - pattern: $A.splice($$$)
+    - pattern: $A.sort($$$)
+    - pattern: $A.reverse($$$)
+    - pattern: $A.fill($$$)
+    - pattern: $A.copyWithin($$$)

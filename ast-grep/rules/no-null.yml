@@ -1,0 +1,36 @@
+id: no-null
+language: TypeScript
+severity: error
+message: null は使用しない（値の不在は undefined で表現する）
+note: |-
+  外部 API / DOM / ライブラリから来る null は、受け取った境界で undefined に変換する。
+  null との比較（=== null / != null）は境界の検査として許可される。
+  ライブラリ契約上 null が必須の場合（React の useRef(null) 等）は
+  前行に `// ast-grep-ignore: no-null` と理由を書いて除外する。
+rule:
+  kind: "null"
+  not:
+    inside:
+      all:
+        - kind: binary_expression
+        - has:
+            field: operator
+            regex: ^[!=]=
+---
+id: no-null-tsx
+language: Tsx
+severity: error
+message: null は使用しない（値の不在は undefined で表現する）
+note: |-
+  JSX で「何も描画しない」は null ではなく undefined を使う。
+  useRef(null) 等ライブラリ契約上必須の場合は
+  前行に `// ast-grep-ignore: no-null-tsx` と理由を書いて除外する。
+rule:
+  kind: "null"
+  not:
+    inside:
+      all:
+        - kind: binary_expression
+        - has:
+            field: operator
+            regex: ^[!=]=

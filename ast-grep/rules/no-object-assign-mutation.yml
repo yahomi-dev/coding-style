@@ -1,0 +1,24 @@
+id: no-object-assign-mutation
+language: TypeScript
+severity: error
+message: Object.assign で既存オブジェクトを変更しない
+note: |-
+  マージは `{ ...a, ...b }` か `Object.assign({}, a, b)` のように
+  新規オブジェクトを生成する形で行う。
+rule:
+  pattern: Object.assign($TARGET, $$$REST)
+constraints:
+  TARGET:
+    not:
+      kind: object
+---
+id: no-object-assign-mutation-tsx
+language: Tsx
+severity: error
+message: Object.assign で既存オブジェクトを変更しない
+rule:
+  pattern: Object.assign($TARGET, $$$REST)
+constraints:
+  TARGET:
+    not:
+      kind: object

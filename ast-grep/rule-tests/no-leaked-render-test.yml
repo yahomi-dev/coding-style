@@ -1,0 +1,13 @@
+id: no-leaked-render
+valid:
+  - |
+    const el = <div>{count > 0 ? <span>has</span> : undefined}</div>;
+  - |
+    const btn = <button disabled={a && b}>ok</button>;
+  - |
+    const title = <div>{name || "unknown"}</div>;
+invalid:
+  - |
+    const bad = <div>{count && <span>has</span>}</div>;
+  - |
+    const worse = <div>{a && b && <span>x</span>}</div>;

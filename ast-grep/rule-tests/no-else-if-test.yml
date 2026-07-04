@@ -1,0 +1,25 @@
+id: no-else-if
+valid:
+  - |
+    if (x > 0) {
+      return "positive";
+    }
+
+    if (x < 0) {
+      return "negative";
+    }
+
+    return "zero";
+  - |
+    if (x > 0) {
+      return "positive";
+    } else {
+      return "other";
+    }
+invalid:
+  - |
+    if (x > 0) {
+      return "positive";
+    } else if (x < 0) {
+      return "negative";
+    }

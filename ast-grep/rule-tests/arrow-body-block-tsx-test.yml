@@ -1,0 +1,9 @@
+id: arrow-body-block-tsx
+valid:
+  - |
+    const button = <button onClick={() => setOpen(true)}>open</button>;
+  - |
+    const names = users.map((u) => u.name);
+invalid:
+  - |
+    const double = (n: number): number => n * 2;
