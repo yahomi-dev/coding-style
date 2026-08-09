@@ -26,7 +26,7 @@
 
 - 型定義は `type` に統一、`interface` 不使用（Biome）
 - `class` 不使用。依存性の注入は関数を引数で受け取る（ast-grep）。フレームワークが class を強制する場合のみ suppression で除外
-- `enum` 不使用。ユニオン型か `as const satisfies` で代替（tsconfig erasableSyntaxOnly + ast-grep）
+- `enum` 不使用。ユニオン型か `as const satisfies` で代替（tsconfig erasableSyntaxOnly + ast-grep）。禁止対象は TS の enum 宣言構文のみ。`z.enum` / `envField.enum` などライブラリの列挙 API は literal union を返すただの関数なので使用可 (「ユニオン型 + パース」の推奨手段であり、literal union の手組みに書き換えない)
 - `let` / `var` 不使用、`const` のみ（ast-grep / Biome）
 - `function` 宣言・式、ジェネレータ、メソッド定義は不使用。すべてアロー関数（ast-grep）。遅延列は Iterator helpers で代替
 - `switch` / `else if` 不使用（ast-grep）
