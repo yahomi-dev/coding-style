@@ -22,7 +22,7 @@ wada式TDD:         テスト(Red) → 実装(Green) → リファクタ
 ### リファクタフェーズについて
 
 - rules（typescript.md, design-policy.md）が常時適用されるため、最初からルールに沿ったコードが出る前提
-- 必要に応じて `/simplify` で別途リファクタ可能
+- 必要に応じて `/simplify` か `/refactor`（`rules/refactoring.md` を opt-in で読み込む）で別途リファクタ可能
 
 ## ワークフロー（4ステップ）
 
@@ -67,6 +67,7 @@ wada式TDD:         テスト(Red) → 実装(Green) → リファクタ
 | `/test-cases` | テストケースを日本語で列挙 |
 | `/test-impl` | テストコードを実装。実行してRedを確認 |
 | `/impl` | 本実装。テスト実行してGreenを確認 |
+| `/refactor` | `rules/refactoring.md` を読み込み、スメル検出とレシピでリファクタ（opt-in） |
 
 ### なぜ4つのSkillsに分けるか
 
