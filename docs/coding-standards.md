@@ -82,6 +82,7 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - 5原則（データと振る舞いの分離 / 型でドメイン表現 / イミュータブル / Result / 副作用の境界化）
 - discriminated union / branded type / Parse, Don't Validate（Zod + fromZod）
 - 型アサーションの三分法（型注釈 = 契約 / satisfies = 検査 / as = 最終手段）
+- 型で表現する範囲の線引き（数えられる状態 = DU / 形式で書ける制約 = parse / 実行時にしか判らない性質と計算違い = テスト）、文脈ごとに型を分ける、素直な型を選ぶ（条件型 / infer / 多段ジェネリクスによる導出を避ける）
 - エラーは kind タグ付き DU。期待される失敗のみ Result、バグは throw
 - 反復語彙の使い分け（filterMap / groupBy / fromEntries / Iterator helpers / reduce は最終手段）
 - 回数不定の反復はライブラリ委譲（p-retry / p-limit）、逐次 await はアダプタ層の for-of、並列 fan-out は `Promise.all(items.map(async ...))`、再帰はデータの形に沿う場合のみ
