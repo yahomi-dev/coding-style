@@ -63,7 +63,7 @@ type FetchState =
 
 ### Branded Type とスマートコンストラクタ
 
-意味を持つ string / number は branded type で別名化し、パース関数（スマートコンストラクタ）とペアで使う。brand 付与の `as` はスマートコンストラクタ内でのみ許可され、スマートコンストラクタは `*.parse.ts`（または `parse/`）に置く（型の入り口 = パーサ）。実例: coding-style リポの `src/email.parse.ts`。
+意味を持つ string / number は branded type で別名化し、パース関数（スマートコンストラクタ）とペアで使う。brand の付与は vendored brand.ts の `Brand<T, B>` で行う (`type Email = Brand<string, "Email">`)。brand キーは brand.ts に閉じた unique symbol なので、型を手書きで再現できず、すべての brand が `Brand<` で grep できる。brand 付与の `as` はスマートコンストラクタ内でのみ許可され、スマートコンストラクタは `*.parse.ts`（または `parse/`）に置く（型の入り口 = パーサ）。実例: coding-style リポの `src/email.parse.ts`。
 
 ### Parse, Don't Validate
 
@@ -307,4 +307,4 @@ exported または複数箇所から参照される定数配列 / オブジェ�
 - **ts-pattern**: DU 分岐
 - **zod**: スキーマパース（フロントエンドはバンドルサイズに応じて zod/mini を検討）
 - **p-retry / p-limit**: 回数不定の反復・並列度制御
-- **vendored**: result.ts / array.ts / schema.ts を coding-style リポの src/ からコピーする（コントラクト層を厳密に、実装層は再生成可能に保つ）
+- **vendored**: result.ts / array.ts / schema.ts / brand.ts を coding-style リポの src/ からコピーする（コントラクト層を厳密に、実装層は再生成可能に保つ）

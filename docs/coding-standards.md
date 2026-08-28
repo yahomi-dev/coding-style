@@ -88,4 +88,4 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - 回数不定の反復はライブラリ委譲（p-retry / p-limit）、逐次 await はアダプタ層の for-of、並列 fan-out は `Promise.all(items.map(async ...))`、再帰はデータの形に沿う場合のみ
 - 局所ミューテーションの二層制（アルゴリズム的必然 = 理由コメント / 性能目的 = 計測必須）
 - JSDoc は exported シンボルのみ必須
-- 標準依存: ts-pattern / zod / p-retry / p-limit、vendored: src/result.ts / src/array.ts / src/schema.ts
+- 標準依存: ts-pattern / zod / p-retry / p-limit、vendored: src/result.ts / src/array.ts / src/schema.ts / src/brand.ts

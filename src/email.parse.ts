@@ -1,10 +1,11 @@
+import type { Brand } from "./brand.js";
 import type { Result } from "./result.js";
 import { err, ok } from "./result.js";
 
 /**
  * 検証済みメールアドレス（branded type）
  */
-export type Email = string & { readonly __brand: "Email" };
+export type Email = Brand<string, "Email">;
 
 /**
  * メールアドレスのパース失敗
