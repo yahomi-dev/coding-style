@@ -6,7 +6,7 @@ React / JSX プロジェクトにのみ適用する overlay。typescript.md（co
 
 - 関数コンポーネントのみ（class コンポーネント禁止は core の no-class がそのまま適用される）
 - コンポーネント名は PascalCase（code-style.md の「関数は camelCase」の例外）
-- hooks の検査は Biome に委譲する: biome.json に `"domains": { "react": "recommended" }` を設定（useExhaustiveDependencies / useHookAtTopLevel 等）
+- hooks の検査は Biome に委譲する (useExhaustiveDependencies / useHookAtTopLevel 等)。Biome 2 は package.json の react を検出して react domain を自動で有効にするが、意図を明示するため biome.json の overrides で対象ディレクトリに `"domains": { "react": "recommended" }` を書く
 
 ## null の例外（core の緩和）
 

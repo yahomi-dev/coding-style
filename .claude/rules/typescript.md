@@ -268,6 +268,8 @@ const showUser = async (
 - ユーティリティ型は `Pick` / `Omit` / `Partial` / `Readonly` 程度に留め、これらの合成で型を「計算」しない
 - 型を導出したくなったら、導出元の型を素直に手で書けないかを先に検討する (重複は許容する)
 
+例外 (契約の型): 契約 (request / response / サービス間の通知) の型は zod schema を正とし、`z.infer` で得てよい。対象は平らな object schema に限る。条件型や、境界のパース以外の transform で型が導出過程を含むようになったら、手書きの型 + `schema satisfies z.ZodType<T>` に戻す。ドメインの型 (discriminated union、Brand) は schema から導出せず手書きする。境界のパースのための transform (スマートコンストラクタで brand を付ける、query の文字列を数値にする) は導出に当たらない。
+
 ```ts
 // NG: 状態が定義から離れた場所で計算される。追加時にコンパイラが修正箇所を列挙しない
 type GetEmployeeState<T> = T extends { employee: infer E }
