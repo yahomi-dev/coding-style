@@ -77,7 +77,7 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 
 ## 判断が必要なルール
 
-詳細: `.claude/rules/typescript.md` / `.claude/rules/design-policy.md` / `.claude/rules/react.md`（React プロジェクトのみ）
+詳細: `.claude/rules/typescript.md` / `.claude/rules/design-policy.md` / `.claude/rules/refactoring.md`（常時適用せず `/refactor` で opt-in） / `.claude/rules/react.md`（React プロジェクトのみ）
 
 - 5原則（データと振る舞いの分離 / 型でドメイン表現 / イミュータブル / Result / 副作用の境界化）
 - discriminated union / branded type / Parse, Don't Validate（Zod + fromZod）
@@ -87,5 +87,6 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - 反復語彙の使い分け（filterMap / groupBy / fromEntries / Iterator helpers / reduce は最終手段）
 - 回数不定の反復はライブラリ委譲（p-retry / p-limit）、逐次 await はアダプタ層の for-of、並列 fan-out は `Promise.all(items.map(async ...))`、再帰はデータの形に沿う場合のみ
 - 局所ミューテーションの二層制（アルゴリズム的必然 = 理由コメント / 性能目的 = 計測必須）
+- リファクタリングはスメル検出（5文超過 / 抽象度混在 / 共通接頭辞 / 分岐の散在 / 未使用の一般性）とレシピの適用で機械的に進める（refactoring.md。常時適用せず `/refactor` で opt-in）
 - JSDoc は exported シンボルのみ必須
 - 標準依存: ts-pattern / zod / p-retry / p-limit、vendored: src/result.ts / src/array.ts / src/schema.ts / src/brand.ts
