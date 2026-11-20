@@ -17,18 +17,21 @@ user_invocable: true
 
 ## 実装ルール
 
-- @.claude/rules/typescript.md に従う
-- @.claude/rules/design-policy.md に従う
+- 規約 `typescript.md` と `design-policy.md` に従う (全体の規約として `~/.claude/rules/` から読み込まれている。正は coding-style の `.claude/rules/`)
 - `/design` で定義した型・シグネチャを変更しない（変更が必要な場合はユーザーに相談する）
 - テストを通すための最小限の実装を行う
 
 ## 確認事項
 
-以下をすべて実行し、エラーがないことを確認する:
+プロジェクトの検査コマンドを実行し、すべて通ることを確認する (全テストが Green、型検査・lint・ast-grep のエラーなし)。
 
-1. `npx vitest run` — 全テストがGreen
-2. `tsc --noEmit` — コンパイルエラーなし
-3. `npx biome check src/` — lint/formatエラーなし
+## 検査コマンド
+
+`npx` で個々のツールを叩かず、プロジェクトの検査コマンドを使う。
+
+- justfile に `verify` があればそれ (lint・ast-grep・型検査・テストをまとめて実行する)
+- 無ければ justfile か package.json の scripts から、lint・ast-grep・型検査・テストに当たるものをすべて実行する
+- `sgconfig.yml` があるのに検査コマンドに ast-grep が含まれていなければ、`ast-grep scan` も実行する
 
 ## 出力フォーマット
 

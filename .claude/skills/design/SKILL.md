@@ -18,8 +18,7 @@ user_invocable: true
 
 ## 設計ルール
 
-- @.claude/rules/typescript.md に従う
-- @.claude/rules/design-policy.md に従う
+- 規約 `typescript.md` と `design-policy.md` に従う (全体の規約として `~/.claude/rules/` から読み込まれている。正は coding-style の `.claude/rules/`)
 - 関数の中身は実装しない。シグネチャだけ定義する
 - 未実装の関数本体には仮の戻り値を入れてコンパイルを通す（`throw new Error("not implemented")` は使わない）
 
@@ -51,8 +50,16 @@ export const isValid = (input: string): boolean => {
 
 1. まず設計意図を簡潔に説明する
 2. 型定義と関数シグネチャをファイルに書き出す
-3. `tsc --noEmit` と `biome check` を実行してエラーがないことを確認する
+3. プロジェクトの検査コマンド (下の「検査コマンド」) を実行し、すべて通ることを確認する (ガワだけなので既存のテストも通る)
 4. 各関数の役割を一覧で示す
+
+## 検査コマンド
+
+`npx` で個々のツールを叩かず、プロジェクトの検査コマンドを使う。
+
+- justfile に `verify` があればそれ (lint・ast-grep・型検査・テストをまとめて実行する)
+- 無ければ justfile か package.json の scripts から、lint・ast-grep・型検査・テストに当たるものをすべて実行する
+- `sgconfig.yml` があるのに検査コマンドに ast-grep が含まれていなければ、`ast-grep scan` も実行する
 
 ## 注意事項
 
