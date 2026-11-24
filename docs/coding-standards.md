@@ -89,3 +89,14 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - 局所ミューテーションの二層制（アルゴリズム的必然 = 理由コメント / 性能目的 = 計測必須）
 - JSDoc は exported シンボルのみ必須
 - 標準依存: ts-pattern / zod / p-retry / p-limit、vendored: src/result.ts / src/array.ts / src/schema.ts / src/brand.ts
+
+## 文書の規約
+
+文書の書き方も「判断が必要なルール」として扱う。正の文書は `docs/` に、機械向けの要約は `.claude/rules/` に置く。このリポジトリには、文書を機械検査するツールはない。
+
+| 規約               | 対象                                                                 | 正の文書                                                 | 機械向けの要約                                               | 強制レイヤ      |
+| ---                | ---                                                                  | ---                                                      | ---                                                          | ---             |
+| 文書の表記と用語   | 返答、コミットメッセージ、PR / MR、設計書、コメント、図のラベル      | `docs/wording-guideline.md`                              | `.claude/rules/wording.md` (常時読み込み)                    | なし (レビュー) |
+| 設計書の書き方     | 名前が `-design.md` で終わる Markdown                                | `docs/design-doc-guideline.md`                           | `.claude/rules/design-doc.md` (`**/*-design.md` で読み込み)  | なし (レビュー)。書き方の機械検査は、プロジェクトで用意する |
+| 外向けの文書       | コミットメッセージ、PR / MR、コミットされるファイル、リリースノート  | `docs/outward-writing.md`                                | `.claude/rules/outward-writing.md` (常時読み込み)            | なし (レビュー)。シークレットの検査と走査のパターンは、プロジェクトで用意する |
+| ADR の書き方と運用 | `docs/adr/` の ADR                                                   | `docs/adr-guideline.md` (雛形は `docs/adr-template.md`)  | `.claude/rules/adr.md` (`docs/adr/**` で読み込み)            | なし (レビュー) |
