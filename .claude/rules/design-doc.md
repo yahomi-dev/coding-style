@@ -5,7 +5,7 @@ paths:
 
 # 設計書のルール (機械向けの要約)
 
-正の文書は coding-style リポジトリの `docs/design-doc-guideline.md`。ここは設計書 (`*-design.md`) を触るときに守る要点だけ。用語と表記は `wording.md` に従う。プロジェクトに設計書の規約があるときは、そちらも守る。
+正本は coding-style リポジトリの `docs/design-doc-guideline.md`。ここは設計書 (`*-design.md`) を触るときに守る要点だけ。用語と表記は `wording.md` に従う。プロジェクトに設計書の規約があるときは、そちらも守る。
 
 ## ADR との境界
 

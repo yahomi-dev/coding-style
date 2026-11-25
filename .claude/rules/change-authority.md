@@ -1,6 +1,6 @@
 # ルールと値の分類 (変更の権限)
 
-正とする文書 (表、理由、誤りの例) は coding-style リポの `docs/harness-engineering.md` の「ルールと値の分類 (変更の権限)」。ここは機械向けの要約。
+正本 (表、理由、誤りの例) は coding-style リポの `docs/harness-engineering.md` の「ルールと値の分類 (変更の権限)」。ここは機械向けの要約。
 
 ## 採用の確認 (最初に読む)
 
