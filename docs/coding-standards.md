@@ -24,6 +24,9 @@
 | クォート   | ダブルクォート | `javascript.formatter.quoteStyle: "double"`    |
 | import整理 | 自動ソート     | `assist.actions.source.organizeImports: "on"`  |
 
+- YAML も Biome が整形し、検査する
+- Markdown は Biome の対象から外す(Biome は frontmatter を書き換える。改行の決まりは `scripts/markdown` が整形する)
+
 ### Lint(Biome)
 
 `preset: recommended` に加えて明示有効化しているもの:
@@ -95,7 +98,7 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 
 ### エディタの設定(EditorConfig)
 
-`.editorconfig` は、Biome が整形しないファイル(Markdown、YAML、シェルなど)にも、文字コード、改行コード、末尾の改行、行末の空白の設定を適用する。  
+`.editorconfig` は、Biome が整形しないファイル(Markdown、シェルなど)にも、文字コード、改行コード、末尾の改行、行末の空白の設定を適用する。  
 エディタが従う設定であり、検証コマンドでは検査しない。
 
 | 項目       | ルール                                                   |
