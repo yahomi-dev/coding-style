@@ -6,10 +6,12 @@
 
 | 種類       | 強制方法                               | 正本                                              |
 | ---        | ---                                    | ---                                               |
-| ツール強制 | Biome / ast-grep / tsconfig / 言い回しの検査が自動検出 | biome.json / ast-grep/rules/ / tsconfig.base.json / scripts/wording/rules.ts |
+| ツール強制 | Biome / ast-grep / tsconfig が自動検出 | biome.json / ast-grep/rules/ / tsconfig.base.json |
 | 判断が必要 | 開発者・AI が判断して遵守              | `.claude/rules/` 配下                             |
 
 検証コマンド: `just verify`(check + scan + wording-check + typecheck-scripts + test-rules + test + build)
+
+文書の規約と、文書とコメントの言い回しの検査(wording-check)は `docs/writing-standards.md`。
 
 ## ツール強制ルール
 
@@ -67,18 +69,6 @@
 
 suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-id>` を置き、理由を添える。
 
-### 言い回しの検査(scripts/wording)
-
-文書とコメントの言い回しを検査する。規則は `scripts/wording/rules.ts` の配列で、追加は要素の追加だけで完結する。対象は git 管理下のテキストファイル。検査しないパス(生成物、外部からコピーしたファイル)は、`scripts/wording/scan.ts` の `EXCLUDED_PATTERNS` に追加する。
-
-| 規則 ID            | 内容                                                         | 根拠                                |
-| ---                | ---                                                          | ---                                 |
-| no-hiku            | 「引く」を、意味ごとの語(求める、取得する、特定する、抽出する)に言い換える | `docs/wording-guideline.md` の用語 <!-- wording-ok --> |
-| no-fullwidth-paren | 半角の `()` を使う(コメント、文字列、文書も含む)           | `docs/wording-guideline.md` の表記  |
-| no-unicode-arrow   | `->` `<-` を使う                                             | `docs/wording-guideline.md` の表記  |
-
-意図的な例外は、該当行に `wording-ok` と書く(Markdown では `<!-- wording-ok -->`)。
-
 ### コンパイラ強制(tsconfig.base.json)
 
 | フラグ                                                    | 効果                                                         |
@@ -132,14 +122,3 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - 局所ミューテーションの二層制(アルゴリズム的必然 = 理由コメント / 性能目的 = 計測必須)
 - JSDoc は exported シンボルのみ必須
 - 標準依存: ts-pattern / zod / p-retry / p-limit、vendored: src/result.ts / src/array.ts / src/schema.ts / src/brand.ts
-
-## 文書の規約
-
-文書の書き方も「判断が必要なルール」として扱う。正本は `docs/` に、機械向けの要約は `.claude/rules/` に置く。用語と表記の一部は `scripts/wording` が検査する(上の「言い回しの検査」)。そのほかはレビューで確認する。
-
-| 規約               | 対象                                                                 | 正本                                                     | 機械向けの要約                                               | 強制レイヤ      |
-| ---                | ---                                                                  | ---                                                      | ---                                                          | ---             |
-| 文書の表記と用語   | 返答、コミットメッセージ、PR / MR、設計書、コメント、図のラベル      | `docs/wording-guideline.md`                              | `.claude/rules/wording.md` (常時読み込み)                    | 一部を `scripts/wording` が検査。そのほかはレビュー |
-| 設計書の書き方     | 名前が `-design.md` で終わる Markdown                                | `docs/design-doc-guideline.md`                           | `.claude/rules/design-doc.md` (`**/*-design.md` で読み込み)  | なし (レビュー)。書き方の機械検査は、プロジェクトで用意する |
-| 外向けの文書       | コミットメッセージ、PR / MR、コミットされるファイル、リリースノート  | `docs/outward-writing.md`                                | `.claude/rules/outward-writing.md` (常時読み込み)            | なし (レビュー)。シークレットの検査と走査のパターンは、プロジェクトで用意する |
-| ADR の書き方と運用 | `docs/adr/` の ADR                                                   | `docs/adr-guideline.md` (雛形は `docs/adr-template.md`)  | `.claude/rules/adr.md` (`docs/adr/**` で読み込み)            | なし (レビュー) |
