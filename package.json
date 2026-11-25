@@ -10,6 +10,8 @@
 		"lint": "biome lint .",
 		"scan": "ast-grep scan",
 		"wording:check": "node scripts/wording/check.ts",
+		"md:check": "node scripts/markdown/check.ts",
+		"md:format": "node scripts/markdown/check.ts --write",
 		"typecheck:scripts": "tsc -p tsconfig.scripts.json",
 		"test": "vitest run",
 		"test:rules": "ast-grep test --skip-snapshot-tests",

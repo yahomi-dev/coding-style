@@ -2,14 +2,15 @@
 
 ## 概要
 
-ルールは「ツール強制」と「判断が必要」の2層で管理する。静的検査可能なルールはプロンプト(.claude/rules/)ではなくツールに置き、.claude/rules/ には原則と判断ルールだけを残す。
+ルールは「ツール強制」と「判断が必要」の2層で管理する。  
+静的検査可能なルールはプロンプト(.claude/rules/)ではなくツールに置き、.claude/rules/ には原則と判断ルールだけを残す。
 
 | 種類       | 強制方法                               | 正本                                              |
 | ---        | ---                                    | ---                                               |
 | ツール強制 | Biome / ast-grep / tsconfig が自動検出 | biome.json / ast-grep/rules/ / tsconfig.base.json |
 | 判断が必要 | 開発者・AI が判断して遵守              | `.claude/rules/` 配下                             |
 
-検証コマンド: `just verify`(check + scan + wording-check + typecheck-scripts + test-rules + test + build)
+検証コマンド: `just verify`(check + scan + wording-check + md-check + typecheck-scripts + test-rules + test + build)
 
 文書の規約と、文書とコメントの言い回しの検査(wording-check)は `docs/writing-standards.md`。
 
@@ -36,13 +37,15 @@
 | style/useImportType                     | type-only import の強制          |
 | style/noNestedTernary                   | ネストした三項演算子の禁止       |
 | style/noEnum / style/noNamespace        | enum / namespace 禁止            |
-| style/noParameterAssign / style/useConst| 引数再代入禁止 / const 強制      |
+| style/noParameterAssign / style/useConst | 引数再代入禁止 / const 強制      |
 | suspicious/noVar(error 指定)          | var 禁止                         |
 | complexity/noForEach                    | forEach 禁止                     |
 
 ### スタイルルール(ast-grep)
 
-`ast-grep/rules/` が正本。原則として各ルールに Tsx 変種(`<rule-id>-tsx`)がある(no-leaked-render は Tsx のみ)。ルール自体のテストは `ast-grep/rule-tests/`(`just test-rules`)。
+`ast-grep/rules/` が正本。  
+原則として各ルールに Tsx 変種(`<rule-id>-tsx`)がある(no-leaked-render は Tsx のみ)。  
+ルール自体のテストは `ast-grep/rule-tests/`(`just test-rules`)。
 
 | ルール ID                  | 内容                                       | 正当な逃し方                                  |
 | ---                        | ---                                        | ---                                           |
@@ -76,37 +79,42 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 | strict / noUncheckedIndexedAccess / exactOptionalPropertyTypes | 厳格な型検査(添字アクセスは undefined を含む)        |
 | erasableSyntaxOnly                                        | enum / ランタイム namespace / class parameter properties を言語レベルで禁止 |
 | verbatimModuleSyntax                                      | type-only import を型エラーで強制                            |
-| isolatedDeclarations(ライブラリのみ)                    | exported シンボルの型明示を強制。declaration を出力するパッケージの tsconfig でのみ有効化する(アプリでは使わない。exported な Zod スキーマ定数と相性が悪い点に注意) |
+| isolatedDeclarations(ライブラリのみ)                    | exported シンボルの型明示を強制<br>declaration を出力するパッケージの tsconfig でのみ有効化する(アプリでは使わない。exported な Zod スキーマ定数と相性が悪い点に注意) |
 
 ## 開発ツール
 
-ツールそのものは指定しない。プロジェクトは、次の決まりを満たすツールを選ぶ。
+ツールそのものは指定しない。  
+プロジェクトは、次の決まりを満たすツールを選ぶ。
 
 | 決まり                         | 内容                                                                                                   | このリポジトリでの実現                      |
 | ---                            | ---                                                                                                    | ---                                         |
-| 検証コマンドを 1 つにする      | lint、ast-grep、型検査、テストをまとめて実行するコマンドを 1 つ用意する。コミットの前と変更の確認にはこのコマンドを使い、個々のツールを直接実行しない | `just verify`                               |
+| 検証コマンドを 1 つにする      | lint、ast-grep、型検査、テストをまとめて実行するコマンドを 1 つ用意する<br>コミットの前と変更の確認にはこのコマンドを使い、個々のツールを直接実行しない | `just verify`                               |
 | バージョンを 1 か所で固定する  | ランタイムとパッケージマネージャのバージョンを、リポジトリの 1 か所に書く                              | `package.json` の `packageManager` と `engines` |
 | コミットの前に検査する         | ステージしたファイルに、整形、走査、言い回しの検査を実行する                                           | lefthook の pre-commit (`lefthook.yml`)     |
 | エディタと Git の設定をそろえる | 文字コード、改行コード、末尾の改行、行末の空白、インデントをそろえる                                   | `.editorconfig`、`.gitattributes`           |
 
 ### エディタの設定(EditorConfig)
 
-`.editorconfig` は、Biome が整形しないファイル(Markdown、YAML、シェルなど)にも、文字コード、改行コード、末尾の改行、行末の空白の設定を適用する。エディタが従う設定であり、検証コマンドでは検査しない。
+`.editorconfig` は、Biome が整形しないファイル(Markdown、YAML、シェルなど)にも、文字コード、改行コード、末尾の改行、行末の空白の設定を適用する。  
+エディタが従う設定であり、検証コマンドでは検査しない。
 
 | 項目       | ルール                                                   |
 | ---        | ---                                                      |
 | 文字コード | UTF-8                                                    |
 | 改行コード | LF                                                       |
 | 末尾の改行 | 入れる                                                   |
-| 行末の空白 | 削除する。Markdown は削除しない(行末の空白 2 つが改行を表すため) |
-| インデント | タブ。Markdown、YAML、シェルスクリプトは空白 2 つ、justfile は空白 4 つ |
+| 行末の空白 | 削除する<br>Markdown は削除しない(行末の空白 2 つが改行を表すため) |
+| インデント | タブ<br>Markdown、YAML、シェルスクリプトは空白 2 つ、justfile は空白 4 つ |
 
-- コードの整形は Biome を正とする。`.editorconfig` のインデントは、`biome.json` の `formatter.indentStyle` と同じ値にする
+- コードの整形は Biome を正とする  
+  `.editorconfig` のインデントは、`biome.json` の `formatter.indentStyle` と同じ値にする
 - Biome の `formatter.useEditorconfig` は使わない(`biome.json` の設定が優先されるので、定義が 2 か所に分かれるため)
 
 ### 改行コード(.gitattributes)
 
-`.gitattributes` の `* text=auto eol=lf` で、リポジトリと作業ツリーの改行コードを LF にそろえる。エディタを通らない変更にも適用される。画像は binary と指定する。
+`.gitattributes` の `* text=auto eol=lf` で、リポジトリと作業ツリーの改行コードを LF にそろえる。  
+エディタを通らない変更にも適用される。  
+画像は binary と指定する。
 
 ## 判断が必要なルール
 
@@ -116,7 +124,8 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 - discriminated union / branded type / Parse, Don't Validate(Zod + fromZod)
 - 型アサーションの三分法(型注釈 = 契約 / satisfies = 検査 / as = 最終手段)
 - 型で表現する範囲の線引き(数えられる状態 = DU / 形式で書ける制約 = parse / 実行時にしか判らない性質と計算違い = テスト)、文脈ごとに型を分ける、素直な型を選ぶ(条件型 / infer / 多段ジェネリクスによる導出を避ける)
-- エラーは kind タグ付き DU。期待される失敗のみ Result、バグは throw
+- エラーは kind タグ付き DU  
+  期待される失敗のみ Result、バグは throw
 - 反復語彙の使い分け(filterMap / groupBy / fromEntries / Iterator helpers / reduce は最終手段)
 - 回数不定の反復はライブラリ委譲(p-retry / p-limit)、逐次 await はアダプタ層の for-of、並列 fan-out は `Promise.all(items.map(async ...))`、再帰はデータの形に沿う場合のみ
 - 局所ミューテーションの二層制(アルゴリズム的必然 = 理由コメント / 性能目的 = 計測必須)

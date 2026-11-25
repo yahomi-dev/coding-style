@@ -11,7 +11,8 @@ date: YYYY-MM-DD
 
 ## Context
 
-決定が必要になった事実を中立に書く。このプロジェクトで実際に起きている問題、制約、計測値。
+決定が必要になった事実を中立に書く。  
+このプロジェクトで実際に起きている問題、制約、計測値。
 
 前提:
 
@@ -20,7 +21,8 @@ date: YYYY-MM-DD
 
 ## Decision
 
-何をするかを能動態で書く。強度は MUST / SHOULD で示す。
+何をするかを能動態で書く。  
+強度は MUST / SHOULD で示す。
 
 1. 〜する (MUST)
 2. 〜する (SHOULD)
@@ -29,12 +31,15 @@ date: YYYY-MM-DD
 
 決定しないこと:
 
-- 〜は決めない。委譲先: `path/to/file` か ADR NNNN (題)
+- 〜は決めない  
+  委譲先: `path/to/file` か ADR NNNN (題)
 
 ## Alternatives
 
-- 案 A: 内容。採らなかった理由
-- 案 B: 内容。採らなかった理由
+- 案 A: 内容  
+  採らなかった理由
+- 案 B: 内容  
+  採らなかった理由
 
 ## Consequences
 

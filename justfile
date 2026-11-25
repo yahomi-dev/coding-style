@@ -21,6 +21,10 @@ scan:
 wording-check:
     pnpm wording:check
 
+# Markdown の改行の決まりを検査する (整形は pnpm md:format)
+md-check:
+    pnpm md:check
+
 # scripts/ の型検査を実行する (src/ の型検査は build が行う)
 typecheck-scripts:
     pnpm typecheck:scripts
@@ -38,4 +42,4 @@ build:
     pnpm build
 
 # すべての検証を実行する(コミット前に実行)
-verify: check scan wording-check typecheck-scripts test-rules test build
+verify: check scan wording-check md-check typecheck-scripts test-rules test build
