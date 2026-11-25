@@ -5,7 +5,7 @@ message: インラインコールバック内で分岐しない
 note: |-
   判定は filter に、変換は map に分離する。
   分岐が必要なら名前付き関数に抽出して参照で渡す。
-  変換して初めて成否が判る場合は `items.map(parse).filter(isDefined)`（filterMap）を使う。
+  変換して初めて成否が判る場合は `items.map(parse).filter(isDefined)`(filterMap)を使う。
 rule:
   all:
     - kind: arrow_function

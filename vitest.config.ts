@@ -6,6 +6,6 @@ import { defineConfig } from "vitest/config";
 // biome-ignore lint/style/noDefaultExport: vitest の設定は default export が必須
 export default defineConfig({
 	test: {
-		include: ["src/**/*.test.ts"],
+		include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
 	},
 });

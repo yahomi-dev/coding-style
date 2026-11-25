@@ -9,7 +9,7 @@ export type Ok<T> = { ok: true; value: T };
 export type Err<E> = { ok: false; error: E };
 
 /**
- * 成功か失敗かを値として表す型（plain object なのでシリアライズ可能）
+ * 成功か失敗かを値として表す型(plain object なのでシリアライズ可能)
  *
  * エラー E は「期待される失敗」を kind タグ付き discriminated union で表現する。
  * プログラムのバグは Result に包まず throw で即死させる。
@@ -45,7 +45,7 @@ export const isErr = <T, E>(result: Result<T, E>): result is Err<E> => {
 };
 
 /**
- * 成功値を変換する（失敗はそのまま通す）
+ * 成功値を変換する(失敗はそのまま通す)
  */
 export const map = <T, U, E>(
 	result: Result<T, E>,
@@ -59,7 +59,7 @@ export const map = <T, U, E>(
 };
 
 /**
- * エラー値を変換する（成功はそのまま通す）
+ * エラー値を変換する(成功はそのまま通す)
  */
 export const mapErr = <T, E, F>(
 	result: Result<T, E>,
@@ -87,7 +87,7 @@ export const andThen = <T, U, E, F>(
 };
 
 /**
- * 失敗からの回復を試みる（成功はそのまま通す）
+ * 失敗からの回復を試みる(成功はそのまま通す)
  */
 export const orElse = <T, E, U, F>(
 	result: Result<T, E>,
@@ -116,7 +116,7 @@ export const match = <T, E, U>(
 };
 
 /**
- * 成功値を取り出す（失敗ならフォールバック値を返す）
+ * 成功値を取り出す(失敗ならフォールバック値を返す)
  */
 export const unwrapOr = <T, E>(result: Result<T, E>, fallback: T): T => {
 	if (result.ok) {
@@ -127,7 +127,7 @@ export const unwrapOr = <T, E>(result: Result<T, E>, fallback: T): T => {
 };
 
 /**
- * Result の配列を単一の Result にまとめる（最初の失敗で short-circuit する）
+ * Result の配列を単一の Result にまとめる(最初の失敗で short-circuit する)
  */
 export const all = <T, E>(results: readonly Result<T, E>[]): Result<T[], E> => {
 	const firstErr = results.find(isErr);
@@ -152,7 +152,7 @@ export const partition = <T, E>(
 };
 
 /**
- * throw しうる関数を実行して Result に変換する（境界用）
+ * throw しうる関数を実行して Result に変換する(境界用)
  */
 export const fromThrowable = <T, E>(
 	f: () => T,
@@ -166,7 +166,7 @@ export const fromThrowable = <T, E>(
 };
 
 /**
- * reject しうる Promise を Result に変換する（境界用）
+ * reject しうる Promise を Result に変換する(境界用)
  */
 export const fromPromise = async <T, E>(
 	promise: Promise<T>,

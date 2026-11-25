@@ -1,7 +1,7 @@
 id: no-class
 language: TypeScript
 severity: error
-message: class は使用しない（type でデータを、関数で振る舞いを定義する）
+message: class は使用しない(type でデータを、関数で振る舞いを定義する)
 note: |-
   依存性の注入は関数を引数で受け取ることで実現する。
   フレームワークが class を強制する場合のみ、前行に
@@ -15,7 +15,7 @@ rule:
 id: no-class-tsx
 language: Tsx
 severity: error
-message: class は使用しない（type でデータを、関数で振る舞いを定義する）
+message: class は使用しない(type でデータを、関数で振る舞いを定義する)
 rule:
   any:
     - kind: class_declaration

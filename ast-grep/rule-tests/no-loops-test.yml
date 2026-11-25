@@ -4,7 +4,7 @@ valid:
     const doubled = items.map((n) => n * 2);
   - |
     const total = items.reduce(add, 0);
-  # for-of はこのルールの対象外（no-for-of-outside-adapter が扱う）
+  # for-of はこのルールの対象外(no-for-of-outside-adapter が扱う)
   - |
     for (const item of items) {
       handle(item);

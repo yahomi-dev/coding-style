@@ -9,7 +9,7 @@ note: |-
   純粋ロジックの反復は map / filter 等の高階関数で書く。
   並列でよい I/O は Promise.all(items.map(async ...)) を使い、
   並列度制御は p-limit へ委譲する。レートリミット等で逐次実行が必須の
-  I/O のみ、アダプタ層（**/adapters/**, *.adapter.ts）で for-of + await を使う。
+  I/O のみ、アダプタ層(**/adapters/**, *.adapter.ts)で for-of + await を使う。
 rule:
   all:
     - kind: for_in_statement

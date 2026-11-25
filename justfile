@@ -17,6 +17,10 @@ format:
 scan:
     pnpm scan
 
+# 文書とコメントの言い回しを検査する (規則は scripts/wording/rules.ts)
+wording-check:
+    pnpm wording:check
+
 # ast-grep ルール自体のテストを実行する
 test-rules:
     pnpm test:rules
@@ -29,5 +33,5 @@ test:
 build:
     pnpm build
 
-# すべての検証を実行する（コミット前に実行）
-verify: check scan test-rules test build
+# すべての検証を実行する(コミット前に実行)
+verify: check scan wording-check test-rules test build

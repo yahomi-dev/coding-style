@@ -9,6 +9,7 @@
 		"format": "biome check --write .",
 		"lint": "biome lint .",
 		"scan": "ast-grep scan",
+		"wording:check": "node scripts/wording/check.ts",
 		"test": "vitest run",
 		"test:rules": "ast-grep test --skip-snapshot-tests",
 		"prepare": "lefthook install"

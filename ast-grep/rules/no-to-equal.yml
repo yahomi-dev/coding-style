@@ -1,0 +1,17 @@
+id: no-to-equal
+language: TypeScript
+severity: error
+message: toEqual は使用しない(toStrictEqual を使う)
+note: |-
+  toEqual は undefined のプロパティを無視するため、exactOptionalPropertyTypes で
+  区別している「不在」と「undefined」の差を検出できない。
+  toStrictEqual にして値が一致しなくなったら、その差が原因なので実装側を確認する。
+rule:
+  pattern: $ACTUAL.toEqual($$$ARGS)
+---
+id: no-to-equal-tsx
+language: Tsx
+severity: error
+message: toEqual は使用しない(toStrictEqual を使う)
+rule:
+  pattern: $ACTUAL.toEqual($$$ARGS)

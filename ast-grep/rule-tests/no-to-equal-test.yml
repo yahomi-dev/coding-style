@@ -1,0 +1,11 @@
+id: no-to-equal
+valid:
+  - |
+    expect(result).toStrictEqual({ ok: true, value: 1 });
+  - |
+    expectTypeOf(result).toEqualTypeOf<string[]>();
+invalid:
+  - |
+    expect(result).toEqual({ ok: true, value: 1 });
+  - |
+    expect(result).not.toEqual([]);

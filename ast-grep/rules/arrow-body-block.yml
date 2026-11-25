@@ -3,7 +3,7 @@ language: TypeScript
 severity: error
 message: 宣言に束縛するアロー関数はブロック本体 + 明示 return で書く
 note: |-
-  式本体（ブロック省略）が許されるのは、呼び出しの引数か
+  式本体(ブロック省略)が許されるのは、呼び出しの引数か
   オブジェクトプロパティに直接書くインラインコールバックのみ。
   例: `items.map((n) => n * 2)` は可、`const double = (n) => n * 2` は不可。
 rule:
@@ -25,7 +25,7 @@ severity: error
 message: 宣言に束縛するアロー関数はブロック本体 + 明示 return で書く
 note: |-
   式本体が許されるのは、呼び出しの引数・オブジェクトプロパティ・
-  JSX 属性（イベントハンドラ等）に直接書くインラインコールバックのみ。
+  JSX 属性(イベントハンドラ等)に直接書くインラインコールバックのみ。
 rule:
   all:
     - kind: arrow_function

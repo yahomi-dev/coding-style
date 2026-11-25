@@ -10,7 +10,7 @@ export type SchemaIssue = {
 };
 
 /**
- * スキーマ検証の失敗（kind タグ付き）
+ * スキーマ検証の失敗(kind タグ付き)
  */
 export type SchemaError = {
 	kind: "schema";
@@ -18,14 +18,14 @@ export type SchemaError = {
 };
 
 /**
- * Zod の safeParse 互換の戻り値（構造的型なので zod 本体への依存は無い）
+ * Zod の safeParse 互換の戻り値(構造的型なので zod 本体への依存は無い)
  */
 export type SafeParseLike<T> =
 	| { success: true; data: T }
 	| { success: false; error: { issues: readonly SchemaIssue[] } };
 
 /**
- * safeParse の戻り値を Result に変換する（Parse, Don't Validate の境界で使う）
+ * safeParse の戻り値を Result に変換する(Parse, Don't Validate の境界で使う)
  */
 export const fromZod = <T>(
 	parsed: SafeParseLike<T>,

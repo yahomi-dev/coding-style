@@ -1,10 +1,10 @@
 id: no-function-keyword
 language: TypeScript
 severity: error
-message: function 宣言 / function 式 / ジェネレータ / メソッド定義は使用しない（アロー関数で統一）
+message: function 宣言 / function 式 / ジェネレータ / メソッド定義は使用しない(アロー関数で統一)
 note: |-
   オブジェクトのメソッドは `key: () => { ... }` のプロパティとして書く。
-  遅延列が欲しい場面はジェネレータではなく Iterator helpers（.values() 起点）で代替する。
+  遅延列が欲しい場面はジェネレータではなく Iterator helpers(.values() 起点)で代替する。
 rule:
   any:
     - kind: function_declaration
@@ -20,7 +20,7 @@ rule:
 id: no-function-keyword-tsx
 language: Tsx
 severity: error
-message: function 宣言 / function 式 / ジェネレータ / メソッド定義は使用しない（アロー関数で統一）
+message: function 宣言 / function 式 / ジェネレータ / メソッド定義は使用しない(アロー関数で統一)
 rule:
   any:
     - kind: function_declaration

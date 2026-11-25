@@ -22,7 +22,7 @@ describe("renderFetchState", () => {
 			error: { kind: "http", statusCode: 404 },
 		});
 
-		expect(result).toBe("HTTP エラー（404）");
+		expect(result).toBe("HTTP エラー(404)");
 	});
 });
 
