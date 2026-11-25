@@ -1,0 +1,12 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"module": "nodenext",
+		"types": ["node"],
+
+		"noEmit": true,
+		"allowImportingTsExtensions": true
+	},
+	"include": ["scripts"],
+	"exclude": ["node_modules", "dist"]
+}

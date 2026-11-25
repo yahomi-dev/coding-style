@@ -21,6 +21,10 @@ scan:
 wording-check:
     pnpm wording:check
 
+# scripts/ の型検査を実行する (src/ の型検査は build が行う)
+typecheck-scripts:
+    pnpm typecheck:scripts
+
 # ast-grep ルール自体のテストを実行する
 test-rules:
     pnpm test:rules
@@ -34,4 +38,4 @@ build:
     pnpm build
 
 # すべての検証を実行する(コミット前に実行)
-verify: check scan wording-check test-rules test build
+verify: check scan wording-check typecheck-scripts test-rules test build

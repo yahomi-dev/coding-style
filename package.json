@@ -10,11 +10,15 @@
 		"lint": "biome lint .",
 		"scan": "ast-grep scan",
 		"wording:check": "node scripts/wording/check.ts",
+		"typecheck:scripts": "tsc -p tsconfig.scripts.json",
 		"test": "vitest run",
 		"test:rules": "ast-grep test --skip-snapshot-tests",
 		"prepare": "lefthook install"
 	},
 	"packageManager": "pnpm@10.14.0",
+	"engines": {
+		"node": ">=24.0.0"
+	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"@ast-grep/cli",
@@ -27,6 +31,7 @@
 	"devDependencies": {
 		"@ast-grep/cli": "^0.44.1",
 		"@biomejs/biome": "^2.5.2",
+		"@types/node": "^24.19.2",
 		"lefthook": "^2.1.4",
 		"ts-pattern": "^5.9.0",
 		"typescript": "^5.9.3",

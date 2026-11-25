@@ -9,7 +9,7 @@
 | ツール強制 | Biome / ast-grep / tsconfig / 言い回しの検査が自動検出 | biome.json / ast-grep/rules/ / tsconfig.base.json / scripts/wording/rules.ts |
 | 判断が必要 | 開発者・AI が判断して遵守              | `.claude/rules/` 配下                             |
 
-検証コマンド: `just verify`(check + scan + wording-check + test-rules + test + build)
+検証コマンド: `just verify`(check + scan + wording-check + typecheck-scripts + test-rules + test + build)
 
 ## ツール強制ルール
 
@@ -95,7 +95,7 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 | 決まり                         | 内容                                                                                                   | このリポジトリでの実現                      |
 | ---                            | ---                                                                                                    | ---                                         |
 | 検証コマンドを 1 つにする      | lint、ast-grep、型検査、テストをまとめて実行するコマンドを 1 つ用意する。コミットの前と変更の確認にはこのコマンドを使い、個々のツールを直接実行しない | `just verify`                               |
-| バージョンを 1 か所で固定する  | ランタイムとパッケージマネージャのバージョンを、リポジトリの 1 か所に書く                              | `package.json` の `packageManager`          |
+| バージョンを 1 か所で固定する  | ランタイムとパッケージマネージャのバージョンを、リポジトリの 1 か所に書く                              | `package.json` の `packageManager` と `engines` |
 | コミットの前に検査する         | ステージしたファイルに、整形、走査、言い回しの検査を実行する                                           | lefthook の pre-commit (`lefthook.yml`)     |
 | エディタと Git の設定をそろえる | 文字コード、改行コード、末尾の改行、行末の空白、インデントをそろえる                                   | `.editorconfig`、`.gitattributes`           |
 
