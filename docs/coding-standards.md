@@ -2,19 +2,20 @@
 
 ## 概要
 
-ルールは「ツール強制」と「判断が必要」の2層で管理する。  
-静的検査可能なルールはプロンプト(.claude/rules/)ではなくツールに置き、.claude/rules/ には原則と判断ルールだけを残す。
+コーディング規約は、コードを書くときに守るルールの全体である。  
+ルールは、守られているかを確認する方法で 2 つに分ける。  
+ツールで検査できるルールはツールに置き、`.claude/rules/` には、ツールで検査できない原則と判断の基準だけを残す。
 
-| 種類       | 強制方法                               | 正本                                              |
+| 種類       | 確認の方法                             | 正本                                              |
 | ---        | ---                                    | ---                                               |
-| ツール強制 | Biome / ast-grep / tsconfig が自動検出 | biome.json / ast-grep/rules/ / tsconfig.base.json |
-| 判断が必要 | 開発者・AI が判断して遵守              | `.claude/rules/` 配下                             |
+| ツールで検査するルール | Biome / ast-grep / tsconfig が自動で検出する | biome.json / ast-grep/rules/ / tsconfig.base.json |
+| レビューで確認するルール | 開発者と AI が読んで従い、レビューで確認する | `.claude/rules/` 配下 |
 
-検証コマンド: `just verify`(check + scan + wording-check + md-check + typecheck-scripts + test-rules + test + build)
+検証コマンド: `just verify`(check + scan + wording-check + md-check + comments-check + secrets-check + typecheck-scripts + test-rules + test + build)
 
-文書の規約と、文書とコメントの言い回しの検査(wording-check)は `docs/writing-standards.md`。
+文書作成の規約と、文書とコメントの検査(wording-check、md-check)は `docs/writing-standards.md`。
 
-## ツール強制ルール
+## ツールで検査するルール
 
 ### フォーマット(Biome)
 
@@ -25,7 +26,7 @@
 | import整理 | 自動ソート     | `assist.actions.source.organizeImports: "on"`  |
 
 - YAML も Biome が整形し、検査する
-- Markdown は Biome の対象から外す(Biome は frontmatter を書き換える。改行の決まりは `scripts/markdown` が整形する)
+- Markdown は Biome の対象から外す(Biome は frontmatter を書き換える。改行のルールは `scripts/markdown` が整形する)
 
 ### Lint(Biome)
 
@@ -75,6 +76,37 @@
 
 suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-id>` を置き、理由を添える。
 
+### コメントの改行(scripts/comments)
+
+コードのコメントは 1 文 1 行で書く(`.claude/rules/code-style.md` の「コメント」)。  
+`pnpm comments:check` が、1 行に複数の文があるコメントを検出する。  
+対象は、行の全体がコメントの行(TypeScript と CSS の `//`、`/*`、JSDoc。シェル、YAML、justfile の `#`)。  
+文の途中で改行しているコメントは、機械で判定できないので、レビューで確認する。  
+意図的な例外は、該当行に `wording-ok` と書く。
+
+### シークレットの検査(scripts/secrets)
+
+シークレットの形をした文字列が、リポジトリに入っていないかを検査する。  
+ルールは `scripts/secrets/rules.ts` の配列で、追加は要素の追加だけで完結する。  
+プロジェクトで使うサービスのトークンの形は、ここに追加する。  
+検出した文字列そのものは出力しない。  
+見本の値などの意図的な例外は、該当行に `secrets-ok` と書く。
+
+| ルール ID                    | 検出する内容                        |
+| ---                          | ---                                 |
+| private-key-block            | 秘密鍵のブロック                    |
+| credential-assignment        | 認証情報に見える値の代入            |
+| connection-string-password   | 接続文字列の中のパスワード          |
+| aws-access-key-id            | AWS のアクセスキー ID               |
+| gitlab-personal-access-token | GitLab のパーソナルアクセストークン |
+
+### `.env` の保護(.claude/settings.json と hook)
+
+AI が `.env` と `.env.*` を読むこと、編集することを、Claude Code の設定で拒否する(`.env.example` は対象外)。  
+`.claude/settings.json` の `permissions.deny` と、PreToolUse の hook(`scripts/hooks/deny-env-access.ts`)を重ねる。  
+判定の内容は `scripts/hooks/envAccess.ts` にあり、テストの対象になる。  
+拒否できる範囲と、できない範囲は `.claude/rules/security.md` に書く。
+
 ### コンパイラ強制(tsconfig.base.json)
 
 | フラグ                                                    | 効果                                                         |
@@ -87,9 +119,9 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 ## 開発ツール
 
 ツールそのものは指定しない。  
-プロジェクトは、次の決まりを満たすツールを選ぶ。
+プロジェクトは、次のルールを満たすツールを選ぶ。
 
-| 決まり                         | 内容                                                                                                   | このリポジトリでの実現                      |
+| ルール                         | 内容                                                                                                   | このリポジトリでの実現                      |
 | ---                            | ---                                                                                                    | ---                                         |
 | 検証コマンドを 1 つにする      | lint、ast-grep、型検査、テストをまとめて実行するコマンドを 1 つ用意する<br>コミットの前と変更の確認にはこのコマンドを使い、個々のツールを直接実行しない | `just verify`                               |
 | バージョンを 1 か所で固定する  | ランタイムとパッケージマネージャのバージョンを、リポジトリの 1 か所に書く                              | `package.json` の `packageManager` と `engines` |
@@ -119,7 +151,7 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
 エディタを通らない変更にも適用される。  
 画像は binary と指定する。
 
-## 判断が必要なルール
+## レビューで確認するルール
 
 詳細: `.claude/rules/typescript.md` / `.claude/rules/design-policy.md` / `.claude/rules/react.md`(React プロジェクトのみ)
 

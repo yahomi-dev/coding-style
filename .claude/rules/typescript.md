@@ -1,4 +1,4 @@
-# TypeScript コーディングルール
+# TypeScript のルール
 
 ## 設計思想
 
@@ -19,10 +19,10 @@ OOP(class / 継承 / メソッド)は使わず、型でデータを定義し関�
 「この書き方は関数型 × データ指向の思想に沿うか？」を判断基準にする。  
 原則と個別ルールが矛盾するように見えた場合は、原則を優先しつつルールの更新を検討する。
 
-### 強制レイヤ
+### 確認の方法
 
 機械検査可能なルールは Biome / ast-grep / tsconfig で強制する(対応表: docs/coding-standards.md)。  
-本書が扱うのは原則と、静的検査できない判断ルール。  
+本書が扱うのは、ツールで検査できない原則と、レビューで確認するルール。  
 lint エラーの message / note に根拠と代替が書いてあるので、違反時はそれに従う。  
 正当な例外は違反行の前行に `// ast-grep-ignore: <rule-id>` と理由を書いて抑制する。
 
@@ -222,7 +222,7 @@ for / for-in / for-of / do-while / forEach は使用しない(ast-grep / Biome)�
   ブラウザ対象では baseline(Safari 18.4+ 等)を確認する
 - **上記で書けない fold(数値集約等)**: `reduce`(最終手段)
 
-コールバックの規約:
+コールバックのルール:
 
 - インラインコールバック内で分岐しない(ast-grep no-branching-in-callback)  
   分岐が要るなら名前付き関数に抽出して参照で渡す
@@ -249,7 +249,7 @@ for / for-in / for-of / do-while / forEach は使用しない(ast-grep / Biome)�
 - 実装は vendored result.ts(ok / err / map / andThen / match / all / partition / fromThrowable / fromPromise)を使う  
   plain object なのでシリアライズ可能
 
-### エラー型の規約
+### エラー型のルール
 
 - E は `kind` タグ付き discriminated union  
   メッセージ文字列ではなくデータを持たせ、文言化は境界(UI / ログ)で行う

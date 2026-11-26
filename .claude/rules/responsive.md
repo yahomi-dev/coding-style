@@ -1,4 +1,4 @@
-# CSS Responsive Rules
+# CSS のレスポンシブのルール
 
 ## 目的
 

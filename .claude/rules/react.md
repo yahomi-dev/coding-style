@@ -1,4 +1,4 @@
-# React ルール(overlay)
+# React のルール (TypeScript への追加)
 
 React / JSX プロジェクトにのみ適用する overlay。  
 typescript.md(core)への**追加**と**明示的な緩和**のみを定め、暗黙の上書きはしない。
@@ -21,7 +21,7 @@ typescript.md(core)への**追加**と**明示的な緩和**のみを定め、�
 ## ref の書き込み(core の緩和)
 
 - `xxxRef.current` への書き込み(`=` / `+=` / `++`)は mutable ref の標準パターンとして許可される  
-  no-member-mutation は `/Ref$/` 命名の変数への `.current` 書き込みを除外する(命名規約が乱用の歯止め)
+  no-member-mutation は `/Ref$/` 命名の変数への `.current` 書き込みを除外する(命名のルールが乱用の歯止め)
 - ref 以外のオブジェクトへの `.current` 代入は通常どおり検出される
 
 ## JSX の条件描画

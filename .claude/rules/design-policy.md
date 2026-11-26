@@ -1,4 +1,4 @@
-# 設計・実装方針
+# 設計と実装の方針
 
 ## 関数設計
 
@@ -58,7 +58,7 @@ type Rule = {
 - ロジックを担う関数は純粋関数として実装する
 - 入出力(console.log、API呼び出し、ファイル操作等)はエントリポイントやアダプタ層で行う
 - mapを副作用の実行に使用しない(mapは変換用)  
-  例外: 並列 I/O の fan-out `Promise.all(items.map(async ...))` は公認イディオム(typescript.md の async 規約を参照)
+  例外: 並列 I/O の fan-out `Promise.all(items.map(async ...))` は公認イディオム(typescript.md の async のルールを参照)
 
 ## テスト戦略
 
@@ -70,7 +70,8 @@ type Rule = {
 - 検証は state-based / value-based で行う(「何が呼ばれたか」ではなく「何が返ったか」)
 - 値の比較は `toStrictEqual` を既定にする(`toEqual` は undefined 値のプロパティを無視するため、`exactOptionalPropertyTypes` で区別している「不在 vs undefined」の差を検出できない)
 - 呼び出し履歴を verify するロンドン学派 (mockist) は採らない
-- そもそも class / メソッドが存在しないため、相互作用検証する対象が構造的に無い
+- class とメソッドを使わないので、オブジェクト同士の呼び出しを検証する場面が設計上ない  
+  関数は「何が返ったか」で検証する
 
 ### Mock ではなく Stub / Fake を使う
 
