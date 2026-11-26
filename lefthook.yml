@@ -7,10 +7,17 @@ pre-commit:
     # 文書とコメントの言い回し (scripts/wording/rules.ts)
     wording-check:
       run: node scripts/wording/check.ts {staged_files}
-    # Markdown の改行の決まり (整形は pnpm md:format)
+    # Markdown の改行のルール (整形は pnpm md:format)
     md-check:
       glob: "*.md"
       run: node scripts/markdown/check.ts {staged_files}
+    # コードのコメントは 1 文 1 行 (1 行に複数の文があるコメントを検出する)
+    comments-check:
+      glob: "*.{ts,tsx,mts,cts,js,mjs,cjs,css,sh,yml,yaml}"
+      run: node scripts/comments/check.ts {staged_files}
+    # シークレットの混入 (ルールは scripts/secrets/rules.ts)
+    secrets-check:
+      run: node scripts/secrets/check.ts {staged_files}
     scan:
       glob: "*.{js,ts,jsx,tsx}"
       run: pnpm exec ast-grep scan {staged_files}

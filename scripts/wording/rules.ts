@@ -1,21 +1,25 @@
-// 文書とコメントの言い回しの規則。追加は配列への要素追加だけで完結する。
-// 検査は scripts/wording/check.ts (just wording-check)。根拠は docs/wording-guideline.md。
+// 文書とコメントの言い回しのルール。
+// 追加は配列への要素追加だけで完結する。
+// 検査は scripts/wording/check.ts (just wording-check)。
+// 根拠は docs/wording-guideline.md。
 
 /**
- * 言い回しの規則 1 件
+ * 言い回しのルール 1 件
  */
 export type WordingRule = {
 	readonly id: string;
-	// 違反の候補。行の中の出現ごとに判定する
+	// 違反の候補。
+	// 行の中の出現ごとに判定する
 	readonly pattern: RegExp;
-	// 候補が複合語などの一部であれば違反にしない語。候補がこの語の範囲に含まれるときだけ除外する
+	// 候補が複合語などの一部であれば違反にしない語。
+	// 候補がこの語の範囲に含まれるときだけ除外する
 	readonly exclude?: RegExp;
 	// 何に言い換えるか
 	readonly message: string;
 };
 
 /**
- * 検査する規則の一覧 (検査する文字そのものは書かず、符号位置で指定する)
+ * 検査するルールの一覧 (検査する文字そのものは書かず、符号位置で指定する)
  */
 export const WORDING_RULES = [
 	{

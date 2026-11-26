@@ -1,5 +1,6 @@
-// Markdown の改行の決まりに合わせて本文を整形する純粋関数。
-// 決まりは docs/wording-guideline.md の「改行」。検査と書き込みは scripts/markdown/check.ts。
+// Markdown の改行のルールに合わせて本文を整形する純粋関数。
+// ルールは docs/wording-guideline.md の「改行」。
+// 検査と書き込みは scripts/markdown/check.ts。
 
 type LineKind =
 	| "verbatim"
@@ -168,7 +169,8 @@ const continues = (kind: LineKind, next: LineKind | undefined): boolean => {
 		: next === "paragraph";
 };
 
-// 段落: 1 文 1 行。続く行があれば、行末に半角スペース 2 つを付ける。
+// 段落: 1 文 1 行。
+// 続く行があれば、行末に半角スペース 2 つを付ける。
 // 箇条書き: 句点を書かず、文の区切りは行末の半角スペース 2 つと、次の行の字下げにする。
 const formatTextLine = (
 	line: string,
@@ -248,7 +250,7 @@ const formatLine = (
 };
 
 /**
- * Markdown の本文を、改行の決まりに合わせて整形する (整形済みの本文は変えない)
+ * Markdown の本文を、改行のルールに合わせて整形する (整形済みの本文は変えない)
  */
 export const formatMarkdown = (text: string): string => {
 	const lines = text.split("\n");
@@ -263,7 +265,8 @@ export const formatMarkdown = (text: string): string => {
 };
 
 /**
- * 整形の前後で内容が異なる最初の行 (1 始まり)。同じなら undefined
+ * 整形の前後で内容が異なる最初の行 (1 始まり)。
+ * 同じなら undefined
  */
 export const firstDifference = (
 	before: string,

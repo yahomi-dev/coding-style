@@ -19,7 +19,7 @@ export type FileViolation = Violation & {
 };
 
 /**
- * 行に書くと、その行の検査を省略する文字列 (規則の説明文など、意図的な例外に使う)
+ * 行に書くと、その行の検査を省略する文字列 (ルールの説明文など、意図的な例外に使う)
  */
 export const IGNORE_MARK = "wording-ok";
 
@@ -38,7 +38,7 @@ const overlaps = (a: Range, b: Range): boolean => {
 };
 
 /**
- * 1 行に規則を適用して、違反の一覧を返す。
+ * 1 行にルールを適用して、違反の一覧を返す。
  * 除外の語は、候補と重なる範囲にあるときだけ適用する (同じ行の別の出現は検出する)。
  */
 export const findViolations = (
@@ -86,12 +86,13 @@ export const checkText = (
 const TARGET_PATTERN =
 	/(?:\.(?:md|mmd|ts|tsx|mts|cts|js|mjs|cjs|css|json|yaml|yml|sh)|(?:^|\/)justfile)$/;
 
-// 検査しないパス。生成物や外部からコピーしたファイルがあるプロジェクトは、ここに追加する
+// 検査しないパス。
+// 生成物や外部からコピーしたファイルがあるプロジェクトは、ここに追加する
 const EXCLUDED_PATTERNS: readonly RegExp[] = [
 	/(?:^|\/)node_modules\//,
 	/(?:^|\/)dist\//,
 	/(?:^|\/)pnpm-lock\.yaml$/,
-	// 規則とテストは、検査する語そのものを含む
+	// ルールとテストは、検査する語そのものを含む
 	/^scripts\/wording\//,
 	// 言い換えの表は、使わない語そのものを含む
 	/^docs\/wording-guideline\.md$/,
@@ -109,7 +110,7 @@ export const isTarget = (path: string): boolean => {
 };
 
 /**
- * 違反 1 件を「パス:行: [規則] 前後の文字 -> 言い換え」の 1 行にする
+ * 違反 1 件を「パス:行: [ルール] 前後の文字 -> 言い換え」の 1 行にする
  */
 export const formatViolation = (v: FileViolation): string => {
 	return `${v.path}:${v.line}: [${v.ruleId}] ${v.context} -> ${v.message}`;

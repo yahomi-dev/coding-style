@@ -51,7 +51,7 @@ describe("no-hiku", () => {
 	});
 });
 
-describe("表記の規則", () => {
+describe("表記のルール", () => {
 	test("全角の丸括弧は出現ごとに違反", () => {
 		expect(idsOf("説明（補足）")).toStrictEqual([
 			"no-fullwidth-paren",

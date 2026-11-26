@@ -4,8 +4,9 @@ import { WORDING_RULES } from "./rules.ts";
 import { checkText, formatViolation, isTarget } from "./scan.ts";
 
 // 文書とコメントの言い回しの検査 (検証コマンドと pre-commit で実行する)。
-// 引数のファイルだけ、無ければ git 管理下の全対象ファイルを検査する。1 件でもあれば終了コード 1。
-// 意図的な例外は、該当行に wording-ok と書く。規則は scripts/wording/rules.ts。
+// 引数のファイルだけ、無ければ git 管理下の全対象ファイルを検査する。
+// 1 件でもあれば終了コード 1。
+// 意図的な例外は、該当行に wording-ok と書く。ルールは scripts/wording/rules.ts。
 
 const trackedFiles = (): readonly string[] => {
 	return execFileSync("git", ["ls-files"], { encoding: "utf8" })

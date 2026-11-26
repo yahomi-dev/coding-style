@@ -2,9 +2,11 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { firstDifference, formatMarkdown } from "./format.ts";
 
-// Markdown の改行の決まりの検査 (検証コマンドと pre-commit で実行する)。
-// 引数のファイルだけ、無ければ git 管理下の全 Markdown を検査する。整形の前後で内容が変わるファイルがあれば終了コード 1。
-// --write を付けると、整形した内容を書き込む。決まりは docs/wording-guideline.md の「改行」。
+// Markdown の改行のルールの検査 (検証コマンドと pre-commit で実行する)。
+// 引数のファイルだけ、無ければ git 管理下の全 Markdown を検査する。
+// 整形の前後で内容が変わるファイルがあれば終了コード 1。
+// --write を付けると、整形した内容を書き込む。
+// ルールは docs/wording-guideline.md の「改行」。
 
 type Finding = {
 	readonly path: string;
@@ -88,7 +90,7 @@ const main = (): void => {
 		findings.map((finding) => `${finding.path}:${finding.line}`).join("\n"),
 	);
 	console.error(
-		`\nmd-check: ${findings.length} ファイルが改行の決まりに合っていません。pnpm md:format で整形してください。`,
+		`\nmd-check: ${findings.length} ファイルが改行のルールに合っていません。pnpm md:format で整形してください。`,
 	);
 	process.exit(1);
 };

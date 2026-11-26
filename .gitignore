@@ -1,2 +1,7 @@
 node_modules/
 dist/
+
+# シークレットを含むファイル (見本の .env.example は管理する)
+.env
+.env.*
+!.env.example
