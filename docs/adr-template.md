@@ -7,7 +7,7 @@ date: YYYY-MM-DD
 # confidence: medium
 ---
 
-# 決定の内容が分かる題
+# 決定の内容が分かるタイトル
 
 ## Context
 
@@ -27,12 +27,12 @@ date: YYYY-MM-DD
 1. 〜する (MUST)
 2. 〜する (SHOULD)
 
-適用範囲: どのリポジトリ、どの層、どの期間に効くか。
+適用範囲: どのリポジトリ、どの層、どの期間に適用されるか。
 
 決定しないこと:
 
 - 〜は決めない  
-  委譲先: `path/to/file` か ADR NNNN (題)
+  委譲先: `path/to/file` か ADR NNNN (タイトル)
 
 ## Alternatives
 
@@ -50,10 +50,10 @@ date: YYYY-MM-DD
 
 ## 参考
 
-- リポジトリ内の実在物 (ファイル、ADR NNNN (題))
+- リポジトリ内の実在物 (ファイル、ADR NNNN (タイトル))
 - 外部の一次資料 (URL、YYYY-MM-DD 確認)
 
-<!-- accepted の後は本文を書き換えず、下の「追記」に日付付きで事実だけを足す -->
+<!-- accepted の後は本文を書き換えず、下の「追記」に日付付きで事実だけを追加する -->
 <!--
 ## 追記
 

@@ -91,7 +91,7 @@ brand の付与は vendored brand.ts の `Brand<T, B>` で行う (`type Email = 
 vendored は、coding-style リポジトリの `src/` からプロジェクトへコピーして使うファイルを指す (一覧は「標準依存」)。  
 brand キーは brand.ts に閉じた unique symbol なので、型を手書きで再現できず、すべての brand が `Brand<` で grep できる。  
 brand 付与の `as` はスマートコンストラクタ内でのみ許可され、スマートコンストラクタは `*.parse.ts`(または `parse/`)に置く(型の入り口 = パーサ)。  
-実例: coding-style リポの `src/email.parse.ts`。
+実例: coding-style リポジトリの `src/email.parse.ts`。
 
 ### Parse, Don't Validate
 
@@ -105,7 +105,7 @@ boolean を返す validate ではなく型を返す parse を書く。
 `noUncheckedIndexedAccess` により添字アクセスは `T | undefined` になるので、undefined を型で処理する。
 
 どちらで表すかの基準 (Type Safety Back and Forth): **外部入力の境界は前に押し出す** (戻り値を `Result` にして呼び出し側に失敗処理を担わせる)、**内部ドメイン関数は後ろに押し出す** (引数を絞った型にして呼び出し側に正しい入力の用意を担わせる)。  
-値を作る場所は使う場所より少ないので、内部で前に押し出すと呼び出し側の数だけハンドリングが増える。  
+値を作成する場所は使う場所より少ないので、内部で前に押し出すと呼び出し側の数だけハンドリングが増える。  
 境界でパースして得た型をそのまま内部に流せば、内側の関数に再検査を書く理由が消える。
 
 ### 型で表現する範囲の線引き
@@ -190,7 +190,7 @@ const double = (n: number): number => {
 
 discriminated union (以下 DU) の網羅的な分岐は ts-pattern の `match().exhaustive()` を正規手段とする。  
 網羅性はコンパイル時に保証される(未マッチ時のランタイム throw は assertNever と同等で、消えるのはボイラープレート)。  
-実例: coding-style リポの `src/fetchState.ts`。
+実例: coding-style リポジトリの `src/fetchState.ts`。
 
 ```ts
 import { match } from "ts-pattern";
@@ -226,7 +226,7 @@ for / for-in / for-of / do-while / forEach は使用しない(ast-grep / Biome)�
   `Map.groupBy` は、結果が関数の内部に閉じる場合だけ使う (Map をドメインデータに使わないため。「イミュータビリティ」を参照)
 - **オブジェクト構築**: `Object.fromEntries` + `map`(reduce + spread で畳まない: O(n²))
 - **長いチェーン・大きい列・early-exit**: Iterator helpers(`items.values().filter(p).map(f).take(n).toArray()`)  
-  遅延評価で中間配列を作らない(Node 22+ / ES2025)  
+  遅延評価で中間配列を作成しない(Node 22+ / ES2025)  
   イテレータは一回消費なので中間イテレータを変数に置かず終端操作まで一気に書く  
   ブラウザ対象では baseline(Safari 18.4+ 等)を確認する
 - **上記で書けない fold(数値集約等)**: `reduce`(最終手段)
@@ -275,7 +275,7 @@ type FetchError =
 ### async の合成は await + 早期 return
 
 `Promise<Result<T, E>>` のチェーンは await して失敗を早期 return する(Rust の `?` を手で展開した形)。  
-async 用のコンビネータ(ResultAsync 等)は作らない。
+async 用のコンビネータ(ResultAsync 等)は作成しない。
 
 ```ts
 const showUser = async (
@@ -324,15 +324,15 @@ const showUser = async (
 
 ### 素直な型を選ぶ
 
-型は「保証が強い」より「その場で読めて、エラーメッセージが直す場所を指す」ことを優先する。  
+型は「保証が強い」より「その場で読めて、エラーメッセージが修正する場所を指す」ことを優先する。  
 型パズルで得られる保証は、discriminated union + branded type + 境界パースで同じ保証が得られないかを先に考える。
 
-効く型の条件 (すべて満たすものを書く):
+機能する型の条件 (すべて満たすものを書く):
 
 - 名前が付いている (type alias で宣言され、名前で grep できる)
 - 定義が 1 箇所にまとまっている (情報が 1〜2 ファイルに集約され、LSP なしでもファイルを読めば型が分かる)
 - その場で数行で読める
-- エラーメッセージが直す場所と直し方を指す
+- エラーメッセージが修正する場所と修正の方法を指す
 
 避ける型 (導出された型):
 
@@ -389,4 +389,4 @@ exported または複数箇所から参照される定数配列 / オブジェ�
 - **ts-pattern**: DU 分岐
 - **zod**: スキーマパース(フロントエンドはバンドルサイズに応じて zod/mini を検討)
 - **p-retry / p-limit**: 回数不定の反復・並列度制御
-- **vendored**: result.ts / array.ts / schema.ts / brand.ts を coding-style リポの src/ からコピーする(コントラクト層を厳密に、実装層は再生成可能に保つ)
+- **vendored**: result.ts / array.ts / schema.ts / brand.ts を coding-style リポジトリの src/ からコピーする(コントラクト層を厳密に、実装層は再生成可能に保つ)

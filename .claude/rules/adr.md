@@ -13,9 +13,9 @@ paths:
 - ADR にするのは「後から なぜ が問われ、覆すコストが高く、複数の案から選んだ」決定だけ  
   実装の詳細、移行計画、タスク、チケット番号、抽象原則だけのものは ADR にしない
 - 問い: 実現方式を別の方式に置き換えたとき書き換えが要る文は、ADR ではなく仕様かコードに置く
-- 雛形を写す  
+- 雛形をコピーする  
   セクションは Context / Decision / Alternatives / Consequences / 参考 の順で固定  
-  使わないセクションは「無し」と書く
+  使わないセクションは「なし」と書く
 
 ## 書くとき (MUST)
 
@@ -24,7 +24,7 @@ paths:
 - Context は観測した事実と前提だけ  
   前提には「崩れたら再検討する」と書く
 - Decision は能動態「〜する」、強度は MUST / SHOULD、適用範囲を書く  
-  末尾に「決定しないこと」と委譲先 (実在するファイルか ADR 番号 + 題)
+  末尾に「決定しないこと」と委譲先 (実在するファイルか ADR 番号 + タイトル)
 - Decision に関数名、環境変数名、列名、例外の扱いを書かない
 - Alternatives を 1 つ以上書き、不採用の理由を付ける
 - Consequences に悪い影響と再評価の条件を書く
@@ -32,7 +32,7 @@ paths:
   打ち合わせの記憶だけを根拠にしない
 - 参照は番号とセクションの名前で指す  
   行番号で指さない  
-  ADR 同士は「ADR NNNN (題)」
+  ADR 同士は「ADR NNNN (タイトル)」
 - 内部限定の情報 (ローカルのメモ、個人のパス、チケット番号、エージェントやセッションの話) を書かない
 - 表記 (括弧は半角 `()`、矢印は `->`、日付は YYYY-MM-DD) は `wording.md` に従う
 
@@ -44,7 +44,7 @@ paths:
   変えるなら新しい ADR を書き、新 ADR に `supersedes`、旧 ADR に `superseded_by` と `status: superseded`  
   一部の項だけが変わるときは旧 ADR を accepted のまま「追記」で置き換え先を示す
 - accepted の後に変えてよいのは、frontmatter (`status`、`date`、`superseded_by`、`review_by`) と、末尾の「追記」(日付付きの事実) だけ
-- status を変えたら `docs/adr/README.md` の一覧も直す
+- status を変えたら `docs/adr/README.md` の一覧も修正する
 
 ## 長さ (SHOULD)
 

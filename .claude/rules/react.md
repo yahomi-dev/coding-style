@@ -40,7 +40,7 @@ typescript.md(core)への**追加**と**明示的な緩和**のみを定め、�
 ## 状態モデリング
 
 - 取得系・非同期系の状態は boolean フラグを並べず discriminated union で表現し(FetchState パターン)、分岐は ts-pattern で行う  
-  実例: coding-style リポの `src/fetchState.ts`
+  実例: coding-style リポジトリの `src/fetchState.ts`
 
 ## TSX の機械検査
 

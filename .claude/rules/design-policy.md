@@ -94,7 +94,7 @@ const greet = async (
     // ...
 };
 
-// テスト設定用: branded type はテストでもスマートコンストラクタで作る(as は使わない)。
+// テスト設定用: branded type はテストでもスマートコンストラクタで作成する(as は使わない)。
 // パース失敗はテスト設定のバグなので throw で即死。
 // コールバック内 if 禁止のため、unwrap はモジュールレベルの関数に抽出する
 const mustParseUserId = (raw: string): UserId => {
@@ -133,7 +133,7 @@ test("ユーザー名で挨拶を返す", async () => {
 - テストファイルは、実装と同じディレクトリに `*.test.ts` として置く
 - 1 つの `it` は 1 つの振る舞いを主張する  
   テスト名が「〜し、〜する」と 2 つの主張をつなぐ形になったら分ける  
-  同じ振る舞いを複数の入力で確かめる expect の並びは可
+  同じ振る舞いを複数の入力で確認する expect の並びは可
 
 ### テストの失敗を実装の前に確認する
 
@@ -150,6 +150,6 @@ test("ユーザー名で挨拶を返す", async () => {
 ### 型レベルテストで型契約を守る
 
 - Branded Type / Discriminated Union / `Result<T, E>` 等の型契約自体を vitest 内蔵の `expectTypeOf` で検証する(expect-type の別途導入は不要)
-- `expectTypeOf` の検査はコンパイル時にのみ効く  
+- `expectTypeOf` の検査はコンパイル時にのみ機能する  
   テストファイルが tsc の型検査対象に入っていること(または `vitest --typecheck` で実行されること)を構成で保証する
 - 「Parse, Don't Validate」の境界では、parser テストが型システムへの入り口の防衛線になる
