@@ -1,6 +1,6 @@
 # React のルール (TypeScript への追加)
 
-React / JSX プロジェクトにのみ適用する overlay。  
+React / JSX プロジェクトにのみ適用する overlay (基になるルールへの追加と緩和だけを定める文書)。  
 typescript.md(core)への**追加**と**明示的な緩和**のみを定め、暗黙の上書きはしない。
 
 ## コンポーネント

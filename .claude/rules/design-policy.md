@@ -82,7 +82,8 @@ type Rule = {
 - 管理外の依存への送信は、Fake が受け取った値を状態として持ち、テストはその状態を `toStrictEqual` で検証してよい  
   これは state-based であり Mock ではない  
   呼び出し回数や順序の検証 (`toHaveBeenCalledTimes` 等) と、自前のモジュールの差し替えは Mock とみなし使わない  
-  Fake は外部システムの状態を持つので、`*.adapter.ts` と同じ扱いで let を許す (理由コメント付き)
+  Fake は外部システムの状態を持つので、let を使ってよい  
+  テストのファイルは no-let の対象外にならないので、前行に `// ast-grep-ignore: no-let` と理由を書く
 
 ```ts
 // プロダクション: I/O を引数で受け取る
@@ -143,7 +144,7 @@ test("ユーザー名で挨拶を返す", async () => {
 
 ### Discriminated Union を持つドメインは property-based testing を検討する
 
-- ADT の網羅性を fast-check 等のジェネレータで担保する
+- discriminated union の網羅性を fast-check 等のジェネレータで担保する
 - `assertNever` による型レベルの網羅性チェックとペアで使うと、型と値の両面で抜けが防げる
 
 ### 型レベルテストで型契約を守る

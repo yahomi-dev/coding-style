@@ -34,7 +34,7 @@ paths:
   行番号で指さない  
   ADR 同士は「ADR NNNN (題)」
 - 内部限定の情報 (ローカルのメモ、個人のパス、チケット番号、エージェントやセッションの話) を書かない
-- 括弧は半角 `()`、矢印は `->`、日付は YYYY-MM-DD
+- 表記 (括弧は半角 `()`、矢印は `->`、日付は YYYY-MM-DD) は `wording.md` に従う
 
 ## ステータス (MUST)
 
@@ -43,7 +43,7 @@ paths:
 - accepted の後は本文 (Context / Decision / Alternatives / Consequences) を書き換えない  
   変えるなら新しい ADR を書き、新 ADR に `supersedes`、旧 ADR に `superseded_by` と `status: superseded`  
   一部の項だけが変わるときは旧 ADR を accepted のまま「追記」で置き換え先を示す
-- accepted の後に足してよいのは frontmatter と末尾の「追記」(日付付きの事実) だけ
+- accepted の後に変えてよいのは、frontmatter (`status`、`date`、`superseded_by`、`review_by`) と、末尾の「追記」(日付付きの事実) だけ
 - status を変えたら `docs/adr/README.md` の一覧も直す
 
 ## 長さ (SHOULD)

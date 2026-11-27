@@ -2,7 +2,7 @@
 
 ## 設計思想
 
-このルールセットは **関数型 × データ指向TypeScript (FP × DOP TypeScript)** スタイルに基づく。  
+このルールセットは **関数型 × データ指向TypeScript (FP × DOP TypeScript)** スタイルに基づく (FP は Functional Programming、DOP は Data-Oriented Programming)。  
 OOP(class / 継承 / メソッド)は使わず、型でデータを定義し関数で振る舞いを定義する。
 
 ### 核となる5つの原則
@@ -15,16 +15,23 @@ OOP(class / 継承 / メソッド)は使わず、型でデータを定義し関�
 
 ### 判断基準
 
-ルールに明記されていない場面で迷ったら、上記5つの原則に立ち返る。  
-「この書き方は関数型 × データ指向の思想に沿うか？」を判断基準にする。  
-原則と個別ルールが矛盾するように見えた場合は、原則を優先しつつルールの更新を検討する。
+判断は、次の順で行う。
+
+1. ルール (この文書と、ツールで検査するルール) に従う
+2. ルールに明記されていない場面では、既存のコードのスタイルに合わせる
+3. 既存のコードにも例が無いときは、上記5つの原則に立ち返る  
+   「この書き方は関数型 × データ指向の思想に沿うか？」を判断基準にする
+
+原則と個別ルールが矛盾するように見えた場合も、ルールに従う。  
+ルールは破らずに、ルールの変更を提案する。
 
 ### 確認の方法
 
 機械検査可能なルールは Biome / ast-grep / tsconfig で強制する(対応表: docs/coding-standards.md)。  
 本書が扱うのは、ツールで検査できない原則と、レビューで確認するルール。  
 lint エラーの message / note に根拠と代替が書いてあるので、違反時はそれに従う。  
-正当な例外は違反行の前行に `// ast-grep-ignore: <rule-id>` と理由を書いて抑制する。
+正当な例外は違反行の前行に `// ast-grep-ignore: <rule-id>` と理由を書いて抑制する。  
+Biome の lint の例外は、前行に `// biome-ignore lint/<グループ>/<ルール>: <理由>` と書く。
 
 ## 言語機能の選択(機械強制済み)
 
@@ -37,7 +44,7 @@ lint エラーの message / note に根拠と代替が書いてあるので、�
 - `enum` 不使用  
   ユニオン型か `as const satisfies` で代替(tsconfig erasableSyntaxOnly + ast-grep)  
   禁止対象は TS の enum 宣言構文のみ  
-  `z.enum` / `envField.enum` などライブラリの列挙 API は literal union を返すただの関数なので使用可 (「ユニオン型 + パース」の推奨手段であり、literal union の手組みに書き換えない)
+  `z.enum` (zod) / `envField.enum` (Astro の `astro/config`) などライブラリの列挙 API は literal union を返すただの関数なので使用可 (「ユニオン型 + パース」の推奨手段であり、literal union の手組みに書き換えない)
 - `let` / `var` 不使用、`const` のみ(ast-grep / Biome)
 - `function` 宣言・式、ジェネレータ、メソッド定義は不使用  
   すべてアロー関数(ast-grep)  
@@ -81,6 +88,7 @@ type FetchState =
 
 意味を持つ string / number は branded type で別名化し、パース関数(スマートコンストラクタ)とペアで使う。  
 brand の付与は vendored brand.ts の `Brand<T, B>` で行う (`type Email = Brand<string, "Email">`)。  
+vendored は、coding-style リポジトリの `src/` からプロジェクトへコピーして使うファイルを指す (一覧は「標準依存」)。  
 brand キーは brand.ts に閉じた unique symbol なので、型を手書きで再現できず、すべての brand が `Brand<` で grep できる。  
 brand 付与の `as` はスマートコンストラクタ内でのみ許可され、スマートコンストラクタは `*.parse.ts`(または `parse/`)に置く(型の入り口 = パーサ)。  
 実例: coding-style リポの `src/email.parse.ts`。
@@ -180,7 +188,7 @@ const double = (n: number): number => {
 
 ### Discriminated Union の分岐は ts-pattern
 
-DU の網羅的な分岐は ts-pattern の `match().exhaustive()` を正規手段とする。  
+discriminated union (以下 DU) の網羅的な分岐は ts-pattern の `match().exhaustive()` を正規手段とする。  
 網羅性はコンパイル時に保証される(未マッチ時のランタイム throw は assertNever と同等で、消えるのはボイラープレート)。  
 実例: coding-style リポの `src/fetchState.ts`。
 
@@ -214,7 +222,8 @@ for / for-in / for-of / do-while / forEach は使用しない(ast-grep / Biome)�
 - **変換して初めて成否が判る(parse 系)**: `filterMap`(vendored array.ts。実体は `map(f).filter(isDefined)` の合成)  
   単なる条件 + 変換は filter -> map に分ける
 - **0..n 展開**: `flatMap`
-- **グルーピング**: `Object.groupBy` / `Map.groupBy`(値は undefined を含みうる点に注意)
+- **グルーピング**: `Object.groupBy`(値は undefined を含みうる点に注意)  
+  `Map.groupBy` は、結果が関数の内部に閉じる場合だけ使う (Map をドメインデータに使わないため。「イミュータビリティ」を参照)
 - **オブジェクト構築**: `Object.fromEntries` + `map`(reduce + spread で畳まない: O(n²))
 - **長いチェーン・大きい列・early-exit**: Iterator helpers(`items.values().filter(p).map(f).take(n).toArray()`)  
   遅延評価で中間配列を作らない(Node 22+ / ES2025)  

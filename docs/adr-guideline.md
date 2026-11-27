@@ -107,10 +107,8 @@ Decision は実装の自由度を奪わない粒度にする。
   10 分で書けないなら、決定が大きすぎるか、実装の詳細を抱え込んでいる
 - SHOULD: 70〜80% の完成度で出し、Accepted の前の点検で埋める  
   完璧を待つと書かれなくなる
-- SHOULD: 日付は `YYYY-MM-DD`  
-  括弧は半角 `()`  
-  矢印は `->`  
-  図は Mermaid か文字
+- MUST: 表記 (日付は `YYYY-MM-DD`、括弧は半角 `()`、矢印は `->`) は `docs/wording-guideline.md` の「表記」に従う
+- SHOULD: 図は Mermaid か文字
 
 ## 3. ステータスと置き換え
 
@@ -128,7 +126,7 @@ proposed -> accepted -> deprecated
 - **superseded**: 新しい ADR で置き換えた  
   `superseded_by` に番号を書く
 
-accepted の後に変えてよいのは、frontmatter (`status`、`superseded_by`、`review_by`) と、末尾の「追記」のセクションだけ。  
+accepted の後に変えてよいのは、frontmatter (`status`、`date`、`superseded_by`、`review_by`) と、末尾の「追記」のセクションだけ。  
 追記は日付付きで事実だけを書く (再評価の結果、前提の変化、置き換え先)。  
 Context、Decision、Alternatives、Consequences の本文は書き換えない。  
 本文を変えたくなったら新しい ADR を書く。
