@@ -1,3 +1,4 @@
+import { normalizePath } from "../shared/path.ts";
 import type { WordingRule } from "./rules.ts";
 
 /**
@@ -100,12 +101,14 @@ const EXCLUDED_PATTERNS: readonly RegExp[] = [
 ];
 
 /**
- * 検査対象のパスかを判定する (リポジトリ直下からの相対パス)
+ * 検査対象のパスかを判定する (リポジトリ直下からの相対パス。先頭の ./ などは取り除いてから判定する)
  */
 export const isTarget = (path: string): boolean => {
+	const normalized = normalizePath(path);
+
 	return (
-		TARGET_PATTERN.test(path) &&
-		!EXCLUDED_PATTERNS.some((pattern) => pattern.test(path))
+		TARGET_PATTERN.test(normalized) &&
+		!EXCLUDED_PATTERNS.some((pattern) => pattern.test(normalized))
 	);
 };
 

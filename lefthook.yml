@@ -12,8 +12,8 @@ pre-commit:
       glob: "*.md"
       run: node scripts/markdown/check.ts {staged_files}
     # コードのコメントは 1 文 1 行 (1 行に複数の文があるコメントを検出する)
+    # 対象のファイル (justfile を含む) は scripts/comments/scan.ts の isTarget が判定する
     comments-check:
-      glob: "*.{ts,tsx,mts,cts,js,mjs,cjs,css,sh,yml,yaml}"
       run: node scripts/comments/check.ts {staged_files}
     # シークレットの混入 (ルールは scripts/secrets/rules.ts)
     secrets-check:

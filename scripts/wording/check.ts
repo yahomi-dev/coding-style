@@ -1,5 +1,4 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readOptional, trackedFiles } from "../shared/files.ts";
 import { WORDING_RULES } from "./rules.ts";
 import { checkText, formatViolation, isTarget } from "./scan.ts";
 
@@ -7,21 +6,6 @@ import { checkText, formatViolation, isTarget } from "./scan.ts";
 // 引数のファイルだけ、無ければ git 管理下の全対象ファイルを検査する。
 // 1 件でもあれば終了コード 1。
 // 意図的な例外は、該当行に wording-ok と書く。ルールは scripts/wording/rules.ts。
-
-const trackedFiles = (): readonly string[] => {
-	return execFileSync("git", ["ls-files"], { encoding: "utf8" })
-		.split("\n")
-		.filter((path) => path !== "");
-};
-
-// 削除済みでステージに残っているファイルは読めないので、undefined にして検査から除外する
-const readOptional = (path: string): string | undefined => {
-	try {
-		return readFileSync(path, "utf8");
-	} catch {
-		return undefined;
-	}
-};
 
 const main = (): void => {
 	const args = process.argv.slice(2);

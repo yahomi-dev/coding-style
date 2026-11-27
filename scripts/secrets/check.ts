@@ -1,5 +1,4 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readOptional, trackedFiles } from "../shared/files.ts";
 import { SECRET_RULES } from "./rules.ts";
 import { findSecrets, formatFinding, isTarget } from "./scan.ts";
 
@@ -8,21 +7,6 @@ import { findSecrets, formatFinding, isTarget } from "./scan.ts";
 // 1 件でもあれば終了コード 1。
 // 検出した文字列そのものは出力しない。
 // 見本の値などの意図的な例外は、該当行に secrets-ok と書く。
-
-const trackedFiles = (): readonly string[] => {
-	return execFileSync("git", ["ls-files"], { encoding: "utf8" })
-		.split("\n")
-		.filter((path) => path !== "");
-};
-
-// 削除済みでステージに残っているファイルは読めないので、undefined にして検査から除外する
-const readOptional = (path: string): string | undefined => {
-	try {
-		return readFileSync(path, "utf8");
-	} catch {
-		return undefined;
-	}
-};
 
 const main = (): void => {
 	const args = process.argv.slice(2);

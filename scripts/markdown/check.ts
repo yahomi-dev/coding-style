@@ -1,5 +1,6 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
+import { readOptional, trackedFiles } from "../shared/files.ts";
+import { normalizePath } from "../shared/path.ts";
 import { firstDifference, formatMarkdown } from "./format.ts";
 
 // Markdown の改行のルールの検査 (検証コマンドと pre-commit で実行する)。
@@ -22,25 +23,12 @@ const EXCLUDED_PATTERNS: readonly RegExp[] = [
 ];
 
 const isTarget = (path: string): boolean => {
+	const normalized = normalizePath(path);
+
 	return (
-		TARGET_PATTERN.test(path) &&
-		!EXCLUDED_PATTERNS.some((pattern) => pattern.test(path))
+		TARGET_PATTERN.test(normalized) &&
+		!EXCLUDED_PATTERNS.some((pattern) => pattern.test(normalized))
 	);
-};
-
-const trackedFiles = (): readonly string[] => {
-	return execFileSync("git", ["ls-files"], { encoding: "utf8" })
-		.split("\n")
-		.filter((path) => path !== "");
-};
-
-// 削除済みでステージに残っているファイルは読めないので、undefined にして検査から除外する
-const readOptional = (path: string): string | undefined => {
-	try {
-		return readFileSync(path, "utf8");
-	} catch {
-		return undefined;
-	}
 };
 
 const findingOf = (path: string): Finding | undefined => {
