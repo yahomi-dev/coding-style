@@ -40,7 +40,7 @@ type PasswordStrengthResult = {
 /**
  * パスワードルール定義
  */
-const passwordRules = [
+const PASSWORD_RULES = [
 	{
 		checker: (pw) => {
 			return pw.length >= 8;
@@ -80,7 +80,7 @@ const passwordRules = [
 /**
  * 強度レベル定義
  */
-const strengthRules = [
+const STRENGTH_RULES = [
 	{
 		checker: (count) => {
 			return count >= 4;
@@ -138,8 +138,8 @@ export const determineStrengthLevel = (
 export const checkPasswordStrength = (
 	password: string,
 ): PasswordStrengthResult => {
-	const matchedLabels = getMatchedLabels(password, passwordRules);
-	const level = determineStrengthLevel(matchedLabels.length, strengthRules);
+	const matchedLabels = getMatchedLabels(password, PASSWORD_RULES);
+	const level = determineStrengthLevel(matchedLabels.length, STRENGTH_RULES);
 
 	return { level, matchedLabels };
 };

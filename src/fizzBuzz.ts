@@ -11,7 +11,7 @@ type FizzBuzzRule = {
 	label: string;
 };
 
-const rules = [
+const RULES = [
 	{
 		checker: (n) => {
 			return n % 3 === 0;
@@ -31,10 +31,9 @@ const rules = [
  * 数値を1つFizzBuzz変換する
  */
 const convert = (n: number): string => {
-	const result = rules
-		.filter((rule) => {
-			return rule.checker(n);
-		})
+	const result = RULES.filter((rule) => {
+		return rule.checker(n);
+	})
 		.map((rule) => {
 			return rule.label;
 		})
