@@ -36,8 +36,8 @@ AI が読み、開発者も同じ文書を読む。
 | `.claude/rules/design-policy.md` | 関数の設計、副作用の分離、テスト戦略 | 常時 |
 | `.claude/rules/code-style.md` | 命名、コメント、検査の方法 | 常時 |
 | `.claude/rules/security.md` | シークレット、実データ、入力の検証<br>AI が dotenv のファイルを読まないための仕組み | 常時 |
-| `.claude/rules/react.md` | React のルール (typescript.md への追加と緩和) | 常時 |
-| `.claude/rules/responsive.md` | CSS のレスポンシブのルール | 常時 |
+| `.claude/rules/react.md` | React のルール (typescript.md への追加と緩和) | `.tsx`、`.jsx` を扱う時 |
+| `.claude/rules/responsive.md` | CSS のレスポンシブのルール | CSS と、スタイルを書くテンプレート (`.astro`、`.vue`、`.svelte`、`.html`) を扱う時 |
 | `.claude/rules/change-authority.md` | ルールと値の分類 (`docs/harness-engineering.md` の要約) | 常時 |
 
 ### 文書作成の規約

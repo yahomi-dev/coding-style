@@ -4,11 +4,12 @@
 ユーザーには日本語で応答してください。
 
 ## コーディングルール
-@.claude/rules/typescript.md のルールに厳密に従ってコードを書いてください。  
+ルールは `.claude/rules/` にあります (一覧は `README.md`)。  
+`.claude/rules/typescript.md` のルールに厳密に従ってコードを書いてください。  
 ルールに記載のない事項については、既存コードのスタイルに合わせてください (判断の順は typescript.md の「判断基準」)。
 
 ## 設計と実装の方針
-@.claude/rules/design-policy.md の方針に従って設計・実装を行ってください。
+`.claude/rules/design-policy.md` の方針に従って設計・実装を行ってください。
 
 ## 規約の採用状況
 - 規約「ルールと値の分類 (変更の権限)」(coding-style): 採用しない (2026-11-24)  

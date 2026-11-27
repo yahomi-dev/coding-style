@@ -114,6 +114,9 @@ suppression の書き方: 違反行の**前行**に `// ast-grep-ignore: <rule-i
   引用符の無い見本の値(`API_KEY=your-api-key-here` の形)も検出するので、見本の行には `secrets-ok` と書く
 - 検査しないパスは、`scripts/secrets/scan.ts` の `EXCLUDED_PATTERNS`(`node_modules/`、`dist/`、`pnpm-lock.yaml`、`scripts/secrets/`)と、画像などのバイナリの拡張子
 
+シークレットの検査の専用のツールは使っていない。  
+導入先のプロジェクトで、ルールの追加か誤検出の調整が続いたときに、専用のツールへの置き換えを検討する。
+
 ### `.env` の保護(.claude/settings.json と hook)
 
 AI が dotenv のファイル(`.env` と `.env.*`。`.env.example` は対象外)を読むこと、編集することを、Claude Code の設定で拒否する。  

@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+---
+
 # React のルール (TypeScript への追加)
 
 React / JSX プロジェクトにのみ適用する overlay (基になるルールへの追加と緩和だけを定める文書)。  
