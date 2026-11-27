@@ -87,7 +87,7 @@ AI が読み、開発者も同じ文書を読む。
 
 ## 検証
 
-Node.js 24 以上、pnpm、just を使う (バージョンは `package.json` の `engines` と `packageManager`)。
+Node.js 26 以上、pnpm、just を使う (バージョンは `package.json` の `engines` と `packageManager`)。
 
 ```sh
 pnpm install
